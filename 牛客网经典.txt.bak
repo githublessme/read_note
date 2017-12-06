@@ -1,1 +1,115 @@
-1.java中aaa
+1.java中整形默认是int 浮点型默认是double，所以 float f=1.1;  int i=3.0  都是需要强转的。   float正确的定义格式为 float f=0.1f; 要用f来告诉java这个是float类型的小数
+2.多线程：java中使用wait必须捕捉异常 而且调用wait或notify方法必须采用当前锁调用,即必须采用synchronized中的对象
+3.Java标识符由数字、字母、下划线(_)、美元符号($)或人民币(¥)组成，首位不能是数字。并且Java关键字不能作为标识符。
+4.java方法覆盖原则：
+	方法的重写（override）两同两小一大原则：
+	方法名相同，参数类型相同
+	子类返回类型小于等于父类方法返回类型，
+	子类抛出异常小于等于父类方法抛出异常，
+	子类访问权限大于等于父类方法访问权限。
+5.java中abstract：
+	含有abstract修饰符的class即为抽象类，abstract 类不能创建的实例对象。
+	含有abstract方法的类必须定义为abstract class，abstract class类中的方法不必是抽象的。
+	abstract class类中定义抽象方法必须在具体(Concrete)子类中实现，所以，不能有抽象构造方法或抽象静态方法。
+	如果的子类没有实现抽象父类中的所有抽象方法，那么子类也必须定义为abstract类型。
+6.java中inteface：
+	变量都是 public static final 的，方法都是 public abstract的
+	java8之后，interface中可以定义 default 方法和static 方法，static 方法只能通过接口名调用，不能通过实现类名调用。default方法只能通过接口实例调用，并且可以在实现类中覆盖。
+		两个接口拥有相同的static方法没关系，可以通过接口类名区分。但是拥有两个相同的default方法就必须在实现类中覆盖这个方法，否则编译器报错。
+
+7.java的异常结构：
+				Throwable
+				/       \
+			    Exception   Error
+		    程序可处理异常      (非检查异常）
+					程序无法处理的错误
+					OutofMemoryError
+					stackoverflowError
+		    /	       \	
+	   非检查异常   	    非运行时异常
+	   RuntimeExcepion  	    检查异常
+	   NullPointerException     IOException
+ArrayIndexOutofBoundsException      EOFEception
+ArithmeticException		    FileNotFoundException
+NumberFormatException		    SQLExcpetion
+
+
+8.java线程：
+	run是线程执行的方法。
+	start是启动线程对象，使之从新建状态转入就绪状态；
+	sleep让线程睡眠一段时间，在此期间线程不消耗CPU资源；
+	suspend使线程挂起，暂停执行， 如果想恢复线程，必须由其他线程调用 resume方法。
+9.java中byte：
+	byte b1=1,b2=2,b3;
+	b3=(b1+b2)   是错误的，因为在计算时，byte会被转换为int类型进行计算，在计算完应该使用强转  正确格式：b3=(byte)(b1+b2);
+	但是当变量是final类型就不会在计算时进行类型转换。
+	例如：final byte b4=4,b5=5;  b3=b4+b5;
+10.java中线程安全类：简单记忆线程安全的集合类： 喂！SHE！  喂是指  vector，S是指 stack， H是指    hashtable，E是指：Eenumeration
+
+11.java中加载器：
+	1）Bootstrap ClassLoader引导类加载器，加载java的核心库，使用原生代码实现的
+ 
+	负责加载$JAVA_HOME中jre/lib/rt.jar里所有的class，由C++实现，不是ClassLoader子类
+
+	2）system class loader 系统类加载器，根据java应用的类路径（classpath）来加载类
+ 
+	2）Extension ClassLoader扩展类加载器，加载java的扩展库
+ 
+	负责加载java平台中扩展功能的一些jar包，包括$JAVA_HOME中jre/lib/*.jar或-Djava.ext.dirs指定目录下的jar包
+ 
+	3）App ClassLoader，tomcat为每个APP创建一个loader,里面保存着此webapp的classloader。需加载webapp下的类时，就取出classloader来使用。
+ 
+	负责记载classpath中指定的jar包及目录中class
+ 
+	4）Custom ClassLoader
+ 
+	属于应用程序根据自身需要自定义的ClassLoader，如tomcat、jboss都会根据j2ee规范自行实现ClassLoader
+ 
+	加载过程中会先检查类是否被已加载，检查顺序是自底向上，从Custom ClassLoader到BootStrap ClassLoader逐层检查，
+	只要某个classloader已加载就视为已加载此类，保证此类只所有ClassLoader加载一次。而加载的顺序是自顶向下，也就是由上层来逐层尝试加载此类。
+
+12.java的参数传递：
+	class Value{
+		public int i=15;
+	}
+	public class Test{
+		public static void main(String argv[]){
+			Test t=new Test( );
+			t.first( );
+		}
+ 
+		public void first( ){
+			int i=5;
+			Value v=new Value( );
+			v.i=25;
+			second(v,i);
+			System.out.println(v.i);
+		}
+ 
+		public void second(Value v,int i){
+			i = 0;
+			v.i = 20;
+			Value val = new Value( );
+			v = val;
+			System.out.println(v.i+" "+i);
+		}
+	}
+
+	输出顺序 15 0 20
+
+13.java中多线程：
+	Java中的多线程是一种抢占式的机制，而不是分时机制。抢占式的机制是有多个线程处于可运行状态，但是只有一个线程在运行。 
+	共同点 ： 
+		1. 他们都是在多线程的环境下，都可以在程序的调用处阻塞指定的毫秒数，并返回。 
+		2. wait()和sleep()都可以通过interrupt()方法 打断线程的暂停状态 ，从而使线程立刻抛出InterruptedException。 
+		如果线程A希望立即结束线程B，则可以对线程B对应的Thread实例调用interrupt方法。如果此刻线程B正在wait/sleep/join，
+		则线程B会立刻抛出InterruptedException，在catch() {} 中直接return即可安全地结束线程。 
+		需要注意的是，InterruptedException是线程自己从内部抛出的，并不是interrupt()方法抛出的。对某一线程调用 interrupt()时，
+		如果该线程正在执行普通的代码，那么该线程根本就不会抛出InterruptedException。但是，一旦该线程进入到 wait()/sleep()/join()后，就会立刻抛出InterruptedException 。 
+	不同点 ：  
+		1.每个对象都有一个锁来控制同步访问。Synchronized关键字可以和对象的锁交互，来实现线程的同步。 
+		sleep方法没有释放锁，而wait方法释放了锁，使得其他线程可以使用同步控制块或者方法。 
+		2.wait，notify和notifyAll只能在同步控制方法或者同步控制块里面使用，而sleep可以在任何地方使用 
+		3.sleep，wait,join必须捕获异常，而notify和notifyAll不需要捕获异常 
+		4.sleep是线程类（Thread）的方法，导致此线程暂停执行指定时间，给执行机会给其他线程，但是监控状态依然保持，到时后会自动恢复。调用sleep不会释放对象锁。
+		5.wait是Object类的方法，对此对象调用wait方法导致本线程放弃对象锁,只有针对此对象发出notify方法（或notifyAll）后本线程才进入对象锁定池准备获得对象锁进入运行状态。
