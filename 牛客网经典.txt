@@ -318,6 +318,81 @@ NumberFormatException		    SQLExcpetion
 50.java中的构造函数：
 	类中普通方法可以和类名相同，和构造函数的区别就是有返回值。
 
+51.java中的ceil和floor
+	ceil：大于等于 x，并且与它最接近的整数。当  x>-1 and x<0  Math.ceil(x)=-0.0;
+	floor：小于等于 x，且与 x 最接近的整数。
+52.java的volatile：
+	所谓 volatile的措施，就是
+	1. 每次从内存中取值，不从缓存中什么的拿值。这就保证了用 volatile修饰的共享变量，每次的更新对于其他线程都是可见的。
+	2. volatile保证了其他线程的立即可见性，就没有保证原子性。
+	3.由于有些时候对 volatile的操作，不会被保存，说明不会造成阻塞。不可用与多线程环境下的计数器。
+
+53.java虚拟机的详细：
+	https://www.nowcoder.com/test/question/done?tid=12727582&qid=14817#summary
+	链接：https://www.nowcoder.com/questionTerminal/2a1cdf3e61d14947bf00dfe10e25a2c0
+	来源：牛客网
+
+	大多数 JVM 将内存区域划分为 Method Area（Non-Heap）（方法区） ,Heap（堆） , Program Counter Register（程序计数器） ,   VM Stack（虚拟机栈，也有翻译成JAVA 方法栈的）,
+	Native Method Stack  （ 本地方法栈 ），其中Method Area 和  Heap 是线程共享的  ，VM Stack，Native Method Stack  和Program Counter Register  是非线程共享的。
+	
+	为什么分为 线程共享和非线程共享的呢?请继续往下看。
+	首先我们熟悉一下一个一般性的 Java 程序的工作过程。一个 Java 源程序文件，会被编译为字节码文件（以 class 为扩展名），每个java程序都需要运行在自己的JVM上
+	，然后告知 JVM 程序的运行入口，再被 JVM 通过字节码解释器加载运行。那么程序开始运行后，都是如何涉及到各内存区域的呢？
+
+	概括地说来，JVM初始运行的时候都会分配好 Method Area（方法区） 和Heap（堆） ，而JVM 每遇到一个线程，就为其分配一个 Program Counter Register（程序计数器） , 
+	  VM Stack（虚拟机栈）和Native Method Stack  （本地方法栈）， 当线程终止时，三者（虚拟机栈，本地方法栈和程序计数器）所占用的内存空间也会被释放掉。
+	这也是为什么我把内存区域分为线程共享和非线程共享的原因，非线程共享的那三个区域的生命周期与所属线程相同，而线程共享的区域与JAVA程序运行的生命周期相同，
+	所以这也是系统垃圾回收的场所只发生在线程共享的区域（实际上对大部分虚拟机来说知发生在Heap上）的原因。
+
+
+54.java中的多态
+package Wangyi;
+class Base
+{
+    public void method()
+    {
+        System.out.println("Base");
+    } 
+}
+class Son extends Base
+{
+    public void method()
+    {
+        System.out.println("Son");
+    }
+     
+    public void methodB()
+    {
+        System.out.println("SonB");
+    }
+}
+public class Test01
+{
+    public static void main(String[] args)
+    {
+        Base base = new Son();
+        base.method();
+        base.methodB();
+    }
+}
+
+编译出错，  原因：
+	多态：父类型的引用可以指向子类型的对象。
+	与函数重载不同
+	在方法调用的时候发现，父类里没有的函数，在多态实现的时候不能出现。
+	父类里如果有调用的是子类的同名方法。
+
+55.java中多线程：
+ConcurrentHashMap使用segment来分段和管理锁，segment继承自ReentrantLock，因此ConcurrentHashMap使用ReentrantLock来保证线程安全。将哈希表分16桶，对需要的桶进行加锁。
+
+
+56.JDK1.7以后
+	Arrays.asList()将一个数组转化为一个List对象，这个方法会返回一个ArrayList类型的对象， 
+	这个ArrayList类并非java.util.ArrayList类，而是Arrays类的静态内部类（java.util.Arrays.ArrayList）！用这个对象对列表进行添加删除更新操作，就会报UnsupportedOperationException异常。
+
+
+
+
 
 
 	

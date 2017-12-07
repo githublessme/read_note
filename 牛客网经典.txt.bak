@@ -254,6 +254,7 @@ NumberFormatException		    SQLExcpetion
 	5. 抽象类可以没有抽象方法,抽象类可以有普通方法,接口中都是抽象方法
 	6. 抽象类可以有静态方法,接口不能有静态方法
 	7. 抽象类中的方法可以是public、protected;接口方法只有public。
+	8. 抽象类中方法默认的访问权限是default，接口是public。
 
 42.javaweb中会话跟踪技术：
 	会话跟踪是一种灵活、轻便的机制，它使Web上的状态编程变为可能。
@@ -270,3 +271,116 @@ NumberFormatException		    SQLExcpetion
 		    在客户端计算机重启后它仍可以保留其值
 		4）.Session：使用 setAttribute(String str,Object obj)方法将对象捆绑到一个会话
 
+43.servlet是不是线程安全的？
+	servlet在多线程下其本身并不是线程安全的。
+	如果在类中定义成员变量，而在service中根据不同的线程对该成员变量进行更改，那么在并发的时候就会引起错误。
+	最好是在方法中，定义局部变量，而不是类变量或者对象的成员变量。
+	由于方法中的局部变量是在栈中，彼此各自都拥有独立的运行空间而不会互相干扰，因此才做到线程安全。
+
+44.java中的堆栈分别储存什么：
+	栈：存放基本类型变量和对象的引用
+	堆：存对象实例（new 出来的）
+	static域：存放所有静态变量和方法。
+	常量池：存放字符串常量和基本类型常量
+	http://www.cnblogs.com/liulipeng/archive/2013/09/13/3319675.html
+
+45.java中finally的执行时间：
+	不管try中有没有catch到异常，finally都会执行
+	当try中有return时，跳转到finally中执行全部代码后结束。
+	当catch中有return时，同上。
+	当try或catch中有System.exit(0)直接结束程序
+
+45.java中局部变量一定要初始化，否则编译出错。
+
+46.java中 int 和Integer 的比较问题：
+	两个int只是常量的普通比较，比较两个int的值。
+	int a=0;Integer b=new Integer(0);  a==b  //true  因为常量池中有0了，所以Integer b直接从常量池中取值，并没有新建对象，所以是true。
+	但是非常重要的一点：两个Integer比较：  
+		Integer a=new Integer(1); Integer b=new Integer(1);  a==b  //true  因为在范围 -128到127内，常量池有值，从常量池中取。内存地址相同。
+		Integer a=new Integer(300);Integer b=new Integer(300); a==b  //false  因为范围超出 -128到127 ，所以新建对象。内存地址不同。
+	
+47.java中多线程：
+	CopyOnWriteArrayList适用于写少读多的并发场景
+	ReadWriteLock即为读写锁，他要求写与写之间互斥，读与写之间互斥，读与读之间可以并发执行。在读多写少的情况下可以提高效率
+	ConcurrentHashMap是同步的HashMap，读写都加锁
+	volatile只保证多线程操作的可见性，不保证原子性
+
+48.getClass().getName()方法
+	如果没有重写Object的getClass()方法，就会返回当前类的类名。（getName返回 包名.类名的格式）
+
+49.java中管道(Pipe)：
+	管道实际上是一种固定大小的缓冲区，管道对于管道两端的进程而言，就是一个文件，但它不是普通的文件，它不属于某种文件系统，而是自立门户，单独构成一种文件系统，
+	并且只存在于内存中。它类似于通信中半双工信道的进程通信机制，一个管道可以实现双向 的数据传输，
+	而同一个时刻只能最多有一个方向的传输，不能两个方向同时进行。管道的容 量大小通常为内存上的一页，它的大小并不是受磁盘容量大小的限制。
+	当管道满时，进程在 写管道会被阻塞，而当管道空时，进程读管道会被阻塞,
+	可以有多个线程操作管道，但不能同时进行读写操作。
+
+50.java中的构造函数：
+	类中普通方法可以和类名相同，和构造函数的区别就是有返回值。
+
+51.java中的ceil和floor
+	ceil：大于等于 x，并且与它最接近的整数。当  x>-1 and x<0  Math.ceil(x)=-0.0;
+	floor：小于等于 x，且与 x 最接近的整数。
+52.java的volatile：
+	所谓 volatile的措施，就是
+	1. 每次从内存中取值，不从缓存中什么的拿值。这就保证了用 volatile修饰的共享变量，每次的更新对于其他线程都是可见的。
+	2. volatile保证了其他线程的立即可见性，就没有保证原子性。
+	3.由于有些时候对 volatile的操作，不会被保存，说明不会造成阻塞。不可用与多线程环境下的计数器。
+
+53.java虚拟机的详细：
+	https://www.nowcoder.com/test/question/done?tid=12727582&qid=14817#summary
+	链接：https://www.nowcoder.com/questionTerminal/2a1cdf3e61d14947bf00dfe10e25a2c0
+	来源：牛客网
+
+	大多数 JVM 将内存区域划分为 Method Area（Non-Heap）（方法区） ,Heap（堆） , Program Counter Register（程序计数器） ,   VM Stack（虚拟机栈，也有翻译成JAVA 方法栈的）,
+	Native Method Stack  （ 本地方法栈 ），其中Method Area 和  Heap 是线程共享的  ，VM Stack，Native Method Stack  和Program Counter Register  是非线程共享的。
+	
+	为什么分为 线程共享和非线程共享的呢?请继续往下看。
+	首先我们熟悉一下一个一般性的 Java 程序的工作过程。一个 Java 源程序文件，会被编译为字节码文件（以 class 为扩展名），每个java程序都需要运行在自己的JVM上
+	，然后告知 JVM 程序的运行入口，再被 JVM 通过字节码解释器加载运行。那么程序开始运行后，都是如何涉及到各内存区域的呢？
+
+	概括地说来，JVM初始运行的时候都会分配好 Method Area（方法区） 和Heap（堆） ，而JVM 每遇到一个线程，就为其分配一个 Program Counter Register（程序计数器） , 
+	  VM Stack（虚拟机栈）和Native Method Stack  （本地方法栈）， 当线程终止时，三者（虚拟机栈，本地方法栈和程序计数器）所占用的内存空间也会被释放掉。
+	这也是为什么我把内存区域分为线程共享和非线程共享的原因，非线程共享的那三个区域的生命周期与所属线程相同，而线程共享的区域与JAVA程序运行的生命周期相同，
+	所以这也是系统垃圾回收的场所只发生在线程共享的区域（实际上对大部分虚拟机来说知发生在Heap上）的原因。
+
+
+54.java中的多态
+package Wangyi;
+class Base
+{
+    public void method()
+    {
+        System.out.println("Base");
+    } 
+}
+class Son extends Base
+{
+    public void method()
+    {
+        System.out.println("Son");
+    }
+     
+    public void methodB()
+    {
+        System.out.println("SonB");
+    }
+}
+public class Test01
+{
+    public static void main(String[] args)
+    {
+        Base base = new Son();
+        base.method();
+        base.methodB();
+    }
+}
+
+编译出错，  原因：
+	多态：父类型的引用可以指向子类型的对象。
+	与函数重载不同
+	在方法调用的时候发现，父类里没有的函数，在多态实现的时候不能出现。
+	父类里如果有调用的是子类的同名方法。
+
+
+	
