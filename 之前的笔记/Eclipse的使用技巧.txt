@@ -1,0 +1,5 @@
+Ctrl+/	为选中行注释
+Alt+/   根据输入进行联想
+Ctrl+shift+o   自动导入所需包
+shift+Enter    自动换一行
+创建User Libraries（以后可以直接通过User Libraries导入所需各种框架的jar包）:Properties-Java Built Path-Add Library-User Library-Next-User Libraries-New-....

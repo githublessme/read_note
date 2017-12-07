@@ -1,0 +1,31 @@
+要和springmvc一样配置web.xml来接收所有请求
+	<filter>
+		<filter-name>struts</filter-name>
+		<filter-class>org.apache.sturts.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter</filter-class>
+	</filter>
+	
+	<filter-mapping>
+		<filter-name>struts</filter-name>
+		<dispatcher>REQUEST</dispatcher>
+		<dispatcher>FORWARD</dispatcher>
+		<url-pattern>/*<url-pattern>
+	</filter-mapping>
+
+在src目录下新建struts.xml文件，
+	<?xml version="1.0" encoding="UTF-8"?>
+	<!DOCTYPE struts PUBLIC
+    		"-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    		"http://struts.apache.org/dtds/struts-2.0.dtd">
+		
+		<struts>
+			<package name="basicstruts" extends="struts-default">
+				<action name="show" class="com.example.action.ProductAction" method="showProduct">
+					<result name="show">showProduct.jsp</result>
+				</action>
+			</package>
+		</struts>
+
+		
+	其中，action的name属性对应浏览器的url的路径，class对应这个Action的位置。method对应调用这个Action中的哪个方法。
+		result的name属性对应method中返回的String变量。
+	注意：在Action中一定要有set和get方法来进行设置和获取成员变量，这样才能在jsp中取得成员变量。和从jsp中取成员变量。am

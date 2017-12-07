@@ -1,0 +1,103 @@
+Bean的标准动作:
+<jsp:useBean id="person" class="foo.Person" scope="request">其中id对应setAttribute时的键。scope的默认工作域是page。
+<jsp:setProperty name="person" property="name" value="mazhen">其中name对应useBean中的id值。property对应Person类中的属性。value为property赋值。
+<jsp:getProperty name="person" property="name">这个标准动作返回person实例中的name属性。
+
+
+	结合用法：
+	<jsp:useBean id="person" class="foo.Person" scope="request">
+		<jsp:setProperty name="person" property="name（*）" value="mazhen"（param="username"(将property赋值为请求参数的值)）>其中可以省略value和param（当Bean与请求参数名相同时，默认从匹配的
+													请求参数名取值。当property中为*，迭代所有请求参数与person属性匹配。
+	</jsp:useBean>
+	这三行代码的意思是:从request范围取一个person键的Person类实例。如果为空（没取到）则生成一个新Person类实例并为其中name属性赋值为mazhen（setProperty完成）。 
+
+
+
+
+
+如果涉及多态，可以在useBean中设置type属性来设置引用类型，而class属性设置对象类型。（class的类型必须是type的类型的子类或者实现，否则出错）。class必须是公共的非抽象的。
+当useBean中只有type而没有class属性时，如果page的工作域中存在person属性那么可以正常工作，反之则不行。因为没有class属性它不知道建立哪种对象类型的实例。
+
+
+
+
+<%@ include file="xxx.jsp" %>与<jsp:include page="xxx.jsp"/>的区别:
+	使用指令是将xxx.jsp转换成代码放在该JSP转换的servlet的_jspservice()中，而标准动作则是在_jspService()中运行时调用xxx.jsp.
+	include指令在转换时发生。而标准动作在运行时发生。
+
+
+
+
+
+<jsp:include page="xxx.jsp">
+	<jsp:param name="xx" value="xxxxx">
+</jsp:include>
+上面三行是在引入页面时向被引入页面传入参数，被引入页面可以通过${param.xx}来获取传过去的值。
+注：（1）<jsp:param>只能存在于<jsp:include>与<jsp:forward>中。
+    （2）转发前会清空输出。在<jsp:include>前的写入响应内的内容会清除。
+    （3）
+
+EL隐式对象：
+（1）作用域属性的map：pageScope、requestScope、sessionScope、applicationScope
+（2）请求参数的map：param、paramValues
+（3）请求首部的map：header、headerValues
+（4）cookie
+（5）上下文初始化参数:initParam
+（6）pageContext的一个引用（不是map式）：pageContext
+
+
+JSTL：
+(1)<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>这是必要的开头。还需在应用的WEB-INF/lib下存放jstl相关的jar文件，在tomcat实例文件下有。
+（2）<c:out value="${xxx.xxx}" escapeXML="true"(默认) default="guest"/>这是JSTL输出语句。
+（3）<c:forEach var="临时变量名" items="${xxx.xx}" varStatus="count">循环体</c:forEach>其中count是计数器。
+(4)<c:if test="${xxx=='xx'}">处理</c:if>
+（5）<c:choose>
+	<c:when test="${xxx='xx'}">
+		处理1
+	</c:when>
+	<c:when test="${xxx='xx'}">
+		处理2
+	</c:when>
+	<c:otherwise>
+		否则处理3
+	</c:otherwise>
+     </c:choose>
+这个相当于if/if else/else。
+（6）
+	设置属性变量var：
+     <c:set var="xxx" scope="session" value="${person.dog}(或者单纯的别的类型)"/>
+     <c:set var="xxx" scope="session">
+	计算体，计算结果作为value
+     </c:set>                             注：如果计算结果为null会删除变量xxx。不指定scope会依次从页面作用域、请求作用域....往下。
+	设置bean和map：
+     <c:set target="${PetMap}" property="dogName" value="Clover"/>
+     <c:set target="${person}" property="name">
+     	${foo.name}
+     </c:set>
+不能同时有“var”和“target”属性。“scope”+是可选的，如果没有使用这个属性，则默认为页面作用域。具体的，当没有使用这个属性时，容器会依次
+在页面作用域、请求作用域、会话作用域、应用作用域查+找，如果找不到“var”指定名字的作用域属性，容器就会在页面作用域新建一个属性；如果找不到“target
+”指定的对象，容器会抛出一个异常。&oq=不能同时有“var”和“target”属性。“scope”+是可选的，如果没有使用这个属性，则默认为页面作用域。具体的，
+当没有使用这个属性时，容器会依次在页面作用域、请求作用域、会话作用域、应用作用域查+找，如果找不到“var”指定名字的作用域属性，容器就会在页面作用域新建一个属性；
+如果找不到“target”指定的对象，容器会抛出一个异常。
+
+
+(7)<c:remove var="xxx" scope="page"/>其中xxx必须是String直接量。如果没有指定scope会从所有作用域里删除这个属性。
+
+
+（8）<c:import url="http://www.baidu.com/index.html"/><%@include file="xx"%>、<jsp:include page="xx">这两种包含不能超出当前容器范围，而<c:import>可以。
+		<%@inlude file="xx"%>是静态的，其它两种是动态的。
+
+（9）<c:param>与<c:import>组合使用，如下：
+	<c:import url="xx.jsp">
+		<c:param name="subText" value="xxxxxx"/>                 原理和<jsp:include>配合<jsp:param>差不多。
+	</c:import>
+
+（10）当用户禁止cookie，可以通过<c:url>来实现url重写:
+	servlet中：response.encodeURL("/BeerTest.do");
+	jstl中：   <c:url value="/BeerTest.do"/>
+	<c:url>不负责编码，value中的参数不能有空格，如果有空格可以使用<c:param>来进行编码。否则将会出错
+
+在WEB-INF存放不能被用户直接访问但是能被应用其他部分访问的页面或者资源。
+
+
+

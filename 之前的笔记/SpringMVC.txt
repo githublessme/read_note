@@ -1,0 +1,20 @@
+又扫盲了一波，阿姨来了项目中的web.xml没有东西是因为只配置了Listener和welcome页面，最关键的是：配置了DispatcherServlet，请求分发器。如下：
+<servlet>spring</servlet>
+<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+
+<servlet-mapping>
+	<servlet-name>spring</servlet-name>       这个dispatcher把所有的请求发送到spring-servlet.xml文件中去。servlet-name对应xxx-servlet.xml
+	<url-pattern>/</url-pattern>
+</servlet-mapping>
+
+
+又来一波扫盲，阿姨来了项目中为什么可以访问WEB-INF文件夹下面的文件呢？
+原因如下：
+	在spring-servlet中配置了视图定位器。
+	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+   		<property name="prefix" value="/WEB-INF/page/" />
+   		<property name="suffix" value=".jsp" />
+	</bean>	
+
+
+再来一波扫盲：在Controller中，RequestMapping映射的方法时，有Modal对象，这个对象会在每一个请求处理方法被调用的时候创建一个Modal实例，用于增加需要显示在视图中的属性。可以通过，modal.setAttribute（String key,Object object）来向前端传送数据。

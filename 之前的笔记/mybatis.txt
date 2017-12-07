@@ -1,0 +1,57 @@
+用到的jar包：mybatis-3.4.2.jar
+
+
+要在项目根目录中新建mybatis-config.xml文件，（相当于hibernate.cfg.xml）
+具体配置如下：
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <typeAliases>
+      <package name="com.example.pojo"/>                     指定别名，在之后各实体类的配置文件中不用指出全名（带包名的名字）
+    </typeAliases>			
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">                                                       dataSource应该知道吧。配置数据库连接的信息
+                <property name="driver" value="com.mysql.jdbc.Driver"/>
+                <property name="url" value="jdbc:mysql://localhost:3306/how2java?characterEncoding=UTF-8"/>
+                <property name="username" value="root"/>
+                <property name="password" value="000000"/>
+            </dataSource>
+        </environment>
+    </environments>
+    <mappers>
+        <mapper resource="com/example/pojo/Category.xml"/>                          mappers用来映射那些实体类各自的配置信息。
+        <mapper resource="com/example/pojo/Product.xml"/>
+    </mappers>
+</configuration>
+
+
+各个实体类的配置信息如下:
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+    <mapper namespace="com.example.pojo">                                   声明命名空间
+        <insert id="addCategory" parameterType="Category" >
+            insert into category_ ( name ) values (#{name})    
+        </insert>
+         
+        <delete id="deleteCategory" parameterType="Category" >
+            delete from category_ where id= #{id}   
+        </delete>
+         
+        <select id="getCategory" parameterType="_int" resultType="Category">
+            select * from   category_  where id= #{id}    
+        </select>
+ 
+        <update id="updateCategory" parameterType="Category" >
+            update category_ set name=#{name} where id=#{id}    
+        </update>
+        <select id="listCategory" resultType="Category">
+            select * from   category_      
+        </select>     
+    </mapper>

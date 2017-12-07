@@ -1,0 +1,316 @@
+要配置两个文件：hibernate.hbm.xml和hibernate.cfg.xml   其中hibernate.hbm.xml是用来将数据库和具体的类关联的。hibernate.cfg.xml是用来设置整个数据库信息的，包括driver url username password 底层数据库 是否显示sql语句 是否自动更新表结构 mapping的资源（也就是hibernate.hbm.xml文件）等等
+
+
+
+hibernate.cfg.xml  配置信息如下：
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC
+       "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+	<session-factory>
+		<!-- 指定连接数据库所用的驱动 -->
+		<property name="connection.driver_class">com.mysql.jdbc.Driver</property>
+		<!-- 指定连接数据库所用的url，其中hibernate是本应用连接的数据库名 -->
+		<property name="connection.url">jdbc:mysql://localhost/hibernate?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false</property>
+		<!-- 指定连接数据库的用户名 -->
+		<property name="connection.username">root</property>
+		<!-- 指定连接数据库的密码 -->
+		<property name="connection.password">000000</property>
+		<!-- 指定连接池里最大连接数 -->
+		<property name="hibernate.c3p0.max_size">20</property>
+		<!-- 指定连接池里最小连接数 -->
+		<property name="hibernate.c3p0.min_size">1</property>
+		<!-- 指定连接池里超时时长 -->
+		<property name="hibernate.c3p0.timeout">5000</property>
+		<!-- 指定连接池里最大缓存多少个statement对象 -->
+		<property name="hibernate.c3p0.max_statements">100</property>
+		<property name="hibernate.c3p0.idle_test_period">3000</property>
+		<property name="hibernate.c3p0.acquire_increment">2</property>
+		<property name="hibernate.c3p0.validate">true</property>
+		<!-- 制定数据库方言 -->
+		<property name="dialect">org.hibernate.dialect.MySQL5InnoDBDialect</property>
+		<!-- 根据需要自动创建表 -->
+		<property name="hbm2ddl.auto">update</property>
+		<!-- 显示hibernate持久化操作所生成的sql -->
+		<property name="show_sql">true</property>
+		<!-- 将sql脚本进行格式化后在输出 -->
+		<property name="hibernate.format_sql">true</property>
+		<!-- 罗列所有持久化类的类名 -->
+		<mapping class="com.example.domain.News"/>
+		<mapping class="com.example.domain.Person"/>
+		<mapping class="com.example.domain.PersonSet"/>
+		<mapping class="com.example.domain.PersonMap"/>
+		<mapping class="com.example.domain.PersonEmbeddable"/>
+	</session-factory>
+</hibernate-configuration>
+
+
+
+hibernate的基本步骤是：
+1. 获取SessionFactory 
+2. 通过SessionFactory 获取一个Session
+3. 在Session基础上开启一个事务
+4. 通过调用Session的save方法把对象保存到数据库
+5. 提交事务
+6. 关闭Session
+7. 关闭SessionFactory
+
+
+重点、重点、重点：在数据库驱动的url后面如果要使用&不能直接写上去     
+而是这样：jdbc:mysql://localhost/hibernate?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false。
+否则会疯狂报错。
+
+自动建表的属性是hbm2ddl 是L不是1
+
+关于调试的一些注意：
+（1）如果一直出一大句英文SSL什么的，那就是数据库url没设置useSSL=false
+（2）如果是deny 什么use password no   就说明可能是配置文件信息填写错误，可以检查cfg.xml文件。
+（3）如果是什么没找到数据库  说明没有在mysql中新建一个数据库，hibernate只能自动创建表但是不能自动为你创建数据库，谨记。尤其是你，。。。
+
+
+在保存持久化对象时有两个方法：save和persist，他俩的区别如下：
+（1）save返回为持久化对象生成的主键值，而persist是void。
+（2）save方法会立刻将对象保存到数据库中并生成标识，而persist可能会等到flush时才将对象插入数据库。
+
+在更新持久化对象时侯有两个方法：update和merge，他俩的区别如下：
+（1）merge方法不会持久化传入的对象。当使用merge（A）时候，程序不会将A持久化，而是new一个B或者在数据库中取得一个B，然后将A的属性copy给B，然后将B持久化，A在这个过程中始终属于托管状态。
+
+
+
+
+当对象中存在集合类的时候，就需要使用各种属性，接下来一一列举！！！！！
+
+
+（1）List属性：
+@ElementCollection(targetClass=String.class)    这个属性中targetClass可以不用设置，hibernate会自动加载。
+@CollectionTable(name="school_inf",joinColumns=@JoinColumn(name="person_id",nullable=false)) 这个属性是为集合元素创建一个表，name是表名,joinColumns是声明有几个外键（其中用@JoinColumn来填写），@JoinColumn中name是用来当外键的那个属性在List表中对应的列名，nullable指出这个外键不能为空。
+@Column(name="school_name")		表示这个属性在集合表的列名是什么。
+@OrderCloumn（name="list_order"）这个属性就是用来定义List和数组的索引列的。name就是这个集合对应表中的列名。（只有List和数组才有，因为他们用角标作为Key）
+private List<String> schools=new ArrayList<String>();
+
+
+（2）数组属性：
+同上。因为原理差不多。
+
+
+（3）Set集合属性:
+首先说明Set的特殊性：set是无序的、不可重复的集合，（没有唯一标识符）
+@ElementCollection(targetClass=String.class)
+@CollectionTable(name="schoolset_inf",joinColumns=@JoinColumn(name="personset_id",nullable=false))
+@Column(name="school_name",nullable=false)解释见List属性部分。
+
+
+（4）Map集合属性：
+首先说明Map的特殊性：Map是Key和Value对应的。
+@ElementCollection(targetClass=Float.class)
+@CollectionTable(name="schoolmap_inf",joinColumns=@JoinColumn(name="personmap_id",nullable=false))
+@MapKeyColumn(name="subject_name")       这行指定Map中key在集合表中的列名
+@MapKeyClass(String.class)		这行指定Map中Key的类型。
+@Column(name="mark") 			这行指定Map中Value在集合表中的列名
+
+
+
+映射组件属性（@Embeddable）：
+当在entity类中出现了复杂类型对象，比如自己创建的类啊。但是仅仅想把它当作值类型来使用，就可以将这个复杂类型对象声明成Embeddable类型。
+	具体做法：
+假如Name是一个自己定义的复杂类型。
+
+组件属性--|
+	  |	
+	  -------@Embeddable
+	  |  public class Name{
+	  |	@Column(name="first_name")          作为entity类对应表中的列名
+	  |	private String first;
+          |
+	  |	@Column(name="last_name")
+	  |	private String last;
+          |
+	  |	@Parent                      @Parent 很重要，声明这个owner不是普通属性而是包含这个类的实体（entity）
+	  |	private Person owner;
+          |
+	  |	//Getter And Setter      
+	  |  }
+          |
+          |
+          |--------@Embeded(比Embeddable配置简单，不用在复杂类中进行配置):
+		只需要在本类中进行配置：
+
+		public class Person{
+	
+			@Embeded 
+			@AttributeOverrides({                                                               Name这个复杂类中需要用到的属性
+				@AttributeOverride(name="first",column=@Column(name="first_name")),          
+				@AttributeOverride(name="last",column=@Column(name="last_name"))
+			})	
+			private Name name;
+		}
+
+
+-----组件属性为集合-----如果在复杂类中有集合属性怎么办？
+答案：在复杂类的集合中按照上方普通集合属性的声明方式声明就可以，Hibernate会自动生成集合对应的列表。
+
+
+-----集合属性的元素为组件
+
+	（1）删除普通集合注释中的Column注释即可，这样会将Name的first和last保存在集合对应的表中，而不是包含集合的entity的表中。
+	（2）用@Embeddable修饰复杂类。
+
+
+-----组件作为Map的索引
+	（1）删除MapKeyColumn注释。
+	（2）重写复杂类的equals和hashCode方法
+
+-----组件作为复合主键
+	（1）复杂类必须有无参构造方法
+	（2）必须实现Serializable借口（4.0版本后不需要）
+	（3）必须正确的重写equals和hashCode方法（能够区别各个对象）
+	（4）用@EmbededId来注释组件并用@AttributeOverrides来注释，@AttributeOverrides用法具体见上面
+
+-----多列作为联合主键
+	（1）要有无参构造器、
+	（2）实现Serializable借口
+	（3）建议根据联合主键所映射的属性来重写equals和hashCode方法
+	（4）只需要在String first 和String last 前面加上@Id注释即可
+上面的各种操作对应的xxx.hbm.xml文件见书P435
+
+因为这些注解是属于JPA规范，JPA是java规范，所以这些注解具有良好的迁移性，使用其他ORM（Object Relation Mapping）组件这些注解可以不变。
+
+
+--------------------------------------------------------------级联-----------------------------------------------------------------------------
+
+
+级联：很关键的一个属性，如果一个实体类映射了另外一个实体类当作外键的话（manyTomany等等），不使用级联，要先保存外键的实体，再保存本类的实体。如果直接设置p.setAddress(new Address("天津市河西区")) 就会报错，因为这时候Address还是一个瞬时对象。本类实体无法关联到Address实体。
+使用级联之后：p.setAddress(new Address("天津市河西区")) 就不会报错，因为本类实体和外键实体进行了级联，先持久化Address再持久化Person。
+一定要优先持久化外键的实体再持久化主表的实体，或者使用级联操作，否则就一定会抛出异常。
+
+
+---------------------------------------------------------------各表关联关系-------------------------------------------------------------------
+
+------N-1无连接表单向
+	@ManyToOne(targetEntity=Address.class)
+	//映射外键列，指定外键列的列名为address_id，并且不能为空
+	@JoinColumn(name="address_id",nullable=false)
+	@Cascade(CascadeType.ALL)
+	private Address Address;
+
+------N-1有连接表单向
+	@ManyToOne(targetEntity=Address.class)
+	@JoinTable(name="person_address",joinColumns=@JoinColumn                    joinColumns为本类对应实体	@JoinColumn中name是在表中的名称											referencedColumnName是对应表中的列名。unique是为其添加唯一约束	
+										这就相当于一个Person只能对应一个Address。
+(name="person_id",referencedColumnName="person_id",unique=true),inverseJoinColumns=@JoinColumn	  inverseJoinColumns为外键的实体(name="address_id",referencedColumnName="address_id"))
+
+------1-1无连接表单向
+
+	@OneToOne(targetEntity=Address.class)
+	@JoinColumn(name="address_id",referencedColumnName="address_id",unique=true)     
+
+------1-1有连接表单向
+
+	@OneToOne
+	@JoinTable(name="person_address_one2one",joinColumns=@JoinColumn(name="person_id",referencedColumnName="person_id",unique=true),
+	inverseJoinColumns=@JoinColumn(name="address_id",referencedColumnName="address_id",unique=true))      
+
+
+-------1-N无连接表单向（不太懂）
+	@OneToMany
+	@JoinColumn(name="person_id",referencedColumnName="person_id")
+	Set<Address> addresses=new HashSet<>();
+	
+	因为没有连接表，所以一个Person有Address集合，但是没有address_id，具体见书P447页，说不清楚，蛋疼。
+
+
+-------1-N有连接表单向
+
+	@OneToMany
+	@JoinTable(name="person_address",joinColumns=@JoinColumn(name="person_id" referencedColumnName="person_id"),inverseJoinColumns=@JoinColumn(name="address_id",referencedColumnName="address_id",unique=true))
+
+	Set<Address> addresses=new HashSet<>();
+
+-------N-N单向(N-N必须使用连接表)
+	@ManyToMany
+	@JoinTable(name="person_address",joinColumns=@JoinColumn(name="person_id" referencedColumnName="person_id"),inverseJoinColumns=@JoinColumn(name="address_id",referencedColumnName="address_id"))
+
+
+	以上都是单向，接下来都是单向
+
+
+-------双向1-N关联无连接（对于1-N，hibernate推荐使用双向关联，而且不要让1的一端控制关联关系，而使用N的一端控制关联关系）
+mappedBy属性：表明当前实体不能控制关联关系，一旦指定了该属性，hibernate就不允许该实体使用@JoinColumn和@JoinTable来修饰代表关联实体的属性了。（一般主表不控制关系）
+
+	在1这端（Person）：
+
+	@OneToMany(targetEntity=Address.class,mappedBy="person")  mappBy就使Person不能控制关联关系。就是无法用p.getAddresses().add(a);这种方法		来生成对应表了。mappedBy="xxx"这个xxx代表对应关联实体中的哪个属性。
+	
+	在N这端（Address）:
+	@ManyToOne(targetEntity=Person.class)
+	@JoinColumn(name="person_id",referencedColumnName="person_id",nullable=false)
+
+	主程序通过  a.setPerson(p);来生成对应关系的表（Address控制关联关系） 而不是p.getAddress().add(a);
+
+	注意事项：（1）先持久化Person，再将它设置给Address.（2）先设置Person和Address的映射关系。（a.setPerson）（3）不要通过Person设置关系
+
+--------双向1-N关联有连接表（可以使1的一端也控制关联关系,取消mappedBy属性，并且@JoinTable中信息和N的一端对应）
+	
+	在N的一端加上JoinTable属性即可。
+
+-------双向N-N关联（只能采用有连接表）
+	都用@JoinTable注释。
+	如果一方放弃控制关联关系，用mappedBy属性注释，就不用写JoinTable注释
+	
+-------双向1-1关联无连接表
+	可以选择任意一端加上@JoinColumn（unique=true），这样这个实体对应的表就是从表，主表应该注释mappedBy属性来放弃控制关联关系。（一般如此）
+
+-------双向1-1有连接表
+	两端加上@JoinTable，并且unique=true，，如果一端想放弃控制关系，注释mappedBy属性，并且不用注释@JoinTable	
+
+
+
+----------------------------------------------------------------继承映射----------------------------------------------------------------------
+
+---------1.整个类层次对应一个表的映射策略(性能好)
+	所有持久化类都存放在一个表中，那么如何分辨一条记录属于哪个实体?  答案：为这个表增加一列@DiscriminatorColumn（辨别者列）,并且所有子类定义的字段不能有非空约束。因为其中好多NULL值。
+	因为是默认的策略，所以不用指定@Inheritance(strategy=InheritanceType.SINGLE_TABLE)
+
+	父类中：@DiscriminatorColumn(name="person_type",discriminatorType=DiscriminatorType.STRING)  name指定辨别者列的列名，Type指定辨别者类型
+		@DisciminatorValue("普通人")
+
+	其他子类中：@DiscriminatorValue("XXX");代表子类的String
+
+
+---------2.连接子类的映射策略
+	子类实体对应的表中只有子类对比父类新增的属性对应的列。用一个person_id关联起来
+	
+	父类中：@Inheritance(strategy=InheritanceType.JOIN)   子类中不定注释其他的。
+
+
+---------3.每个具体类对应一个表的映射策略
+	很难看出有什么继承关系，因为各自属性都在各自的表中。多个实体之间的主键应具有连续性，所以不能让数据库为各自数据表自动生成主键。
+
+	父类中：
+	@Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
+	
+	在id属性时候： @GenericGenerator(name="person_hilo",strategy="hilo")
+		       @GeneratedValue(generator="person_hilo")
+
+
+
+-----------------------------------------------------批量插入、更新、删除----------------------------------------------------------------------
+
+------------批量插入
+	每插入20条数据，session.flush();session.clear();
+
+------------批量更新(低效)
+	setXXX  ,每20次  session.flush();session.clear();
+
+------------DML风格批量更新
+	String hqlUpdate="update SimplePerson u set name=:newName";
+	int updateEntities=session.createQuery(hqlUpdate).setString("newName","新名字").excuteUpdate();
+
+------------DML风格批量删除
+	String hqlUpdate="delete SimplePerson";
+	int updateEntities=session.createQuery(hqlUpdate).excuteUpdate();
+
+--------------------------------------------------------使用HQL查询----------------------------------------------------------------------------
+
+	

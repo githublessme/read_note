@@ -1,0 +1,42 @@
+-----------------------------------------------------------配置信息---------------------------------------------------------------------------
+1.配置数据源： 
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close"
+		p:................./>
+2.定义Hibernate的SessionFactory
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean"
+		p:dataSource-ref="dataSource">
+		<property name="annotatedClasses">
+			<list>
+				<value>com.example.domain.Book</value>
+				<value>在这里列出其他的类</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="org.hibernate.dialect.MySQL5InnoDBDialect"</prop>
+				<prop key="hibernate.hbm2ddl.auto">true</prop>
+				<prop key="xxxx">这里列出其他的设置</prop>
+			</props>
+		</property>
+	</bean>
+
+3.实现DAO组件的基类
+
+通常提供的方法：
+	1.根据ID来加载持久化实体
+	2.保存持久化实体
+	3.更新持久化实体
+	4.删除持久化实体，以及根据ID删除持久化实体
+	5.获取所有的持久化实体
+
+	public interface BaseDao<T>{
+		T get(class<T> clazz,Serializable id);
+		Serializable save(T entity);                                 具体方法实现见书P704
+		void update(T entity);
+		void delete(T entity);
+		void delete(Class<T> clazz,Serializable id);
+		List<T> findAll(Class<T> entityClazz);
+		Long findCount(Class<T> entityClazz);
+	}
+
+	
