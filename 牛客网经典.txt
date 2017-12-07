@@ -200,3 +200,73 @@ NumberFormatException		    SQLExcpetion
 30.java中多线程：
 	CyclicBarrier和count DownLatch都可以让一组线程等待其他线程。
 	Callable 中的call（）方法可以返回值和跑出异常（checkedException）
+
+31.java中的初始化顺序：
+	初始化父类中的静态成员和静态代码快，初始化子类中的静态成员和静态代码块。初始化父类中普通成员变量和代码块，再执行父类中的构造方法。初始化子类中的普通成员变量
+	和代码块，再执行子类中的构造方法。
+
+32.java中的标准statement
+	1.statement是最基本的用法，采用字符串拼接的方法，存在sql注入漏洞。
+	2.preparedstatement对statement中的sql语句进行预编译，同时检查合法性，效率高。
+	3.CallableStatement接口扩展PreparedStatement，用来调用存储过程，它提供了对输入和输出参数的支持，CallableStatement接口还具有对PreparedStatement接口提供的输入
+	  输出的参数支持。
+
+33.java中static变量
+	java中 static的int 默认初始值为0；
+
+34.java中Collection的线程安全：
+	HashMap和TreeMap都未考虑线程安全。
+	HashTable 和 ConcurrentHashMap都是线程安全的，只是加锁的范围不同，HashTable将整个哈希表进行加锁，而ConcurrentHashMap将哈希表分为16桶，每次对需要的桶进行加锁。
+
+35.java中的重载：
+	1.在同一个类中。
+	2.方法名相同。
+	3.方法的形参不同，具体表现为：类型、个数、顺序不同才可以重载。
+	4.比较容易忽略的点：与方法的返回类型和访问权限无关。
+
+36.java中的基本类型：
+	long a=012；true   因为是基本类型所以编译器会自动进行转型。
+	float b=-412； true  同上，      但是float b=-412.2； false  因为java中默认的浮点型为double，所以会报错。
+
+37.java中多线程：
+	一定要注意线程调用的是什么方法，如果调用的是start方法则开启一条新线程，但是如果调用的是run方法就只是普通的调用函数，会顺序执行，不会开启新线程。
+
+38.java中的静态方法：
+	java的NullPointerException是引用堆内存的对象为空时，才是空指针异常。
+	静态方法不依赖对象，所以即使对象为null也可以调用静态方法。   例如： Test t=null；t.hello();  （hello为Test类中公有静态方法）
+
+39.Hibernate优化所鼓励的7大措施：
+	1.尽量使用many-to-one，避免使用单项one-to-many
+	2.灵活使用单向one-to-many
+	3.不用一对一，使用多对一代替一对一
+	4.配置对象缓存，不使用集合缓存
+	5.一对多使用Bag 多对一使用Set
+	6.继承使用显示多态 HQL:from object polymorphism="exlicit" 避免查处所有对象
+	7.消除大表，使用二级缓存
+
+40.servlet体系结构，看图。
+
+41.java中抽象类和接口的区别：
+	1. 一个子类只能继承一个抽象类,但能实现多个接口
+	2. 抽象类可以有构造方法,接口没有构造方法
+	3. 抽象类可以有普通成员变量,接口没有普通成员变量
+	4. 抽象类和接口都可有静态成员变量,抽象类中静态成员变量访问类型任意,接口只能public static final(默认)
+	5. 抽象类可以没有抽象方法,抽象类可以有普通方法,接口中都是抽象方法
+	6. 抽象类可以有静态方法,接口不能有静态方法
+	7. 抽象类中的方法可以是public、protected;接口方法只有public。
+
+42.javaweb中会话跟踪技术：
+	会话跟踪是一种灵活、轻便的机制，它使Web上的状态编程变为可能。
+	HTTP是一种无状态协议，每当用户发出请求时，服务器就会做出响应，客户端与服务器之间的联系是离散的、非连续的。
+	当用户在同一网站的多个页面之间转换时，根本无法确定是否是同一个客户，会话跟踪技术就可以解决这个问题。
+	当一个客户在多个页面间切换时，服务器会保存该用户的信息。
+
+	有四种方法可以实现会话跟踪技术：URL重写、隐藏表单域、Cookie、Session。
+		1）.隐藏表单域：<input type="hidden">，非常适合步需要大量数据存储的会话应用。
+		2）.URL 重写:URL 可以在后面附加参数，和服务器的请求一起发送，这些参数为名字/值对。
+		3）.Cookie:一个 Cookie 是一个小的，已命名数据元素。服务器使用 SET-Cookie 头标将它作为 HTTP
+		    响应的一部分传送到客户端，客户端被请求保存 Cookie 值，在对同一服务器的后续请求使用一个
+		    Cookie 头标将之返回到服务器。与其它技术比较，Cookie 的一个优点是在浏览器会话结束后，甚至
+		    在客户端计算机重启后它仍可以保留其值
+		4）.Session：使用 setAttribute(String str,Object obj)方法将对象捆绑到一个会话
+

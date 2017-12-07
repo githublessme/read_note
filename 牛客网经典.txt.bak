@@ -105,11 +105,142 @@ NumberFormatException		    SQLExcpetion
 		如果线程A希望立即结束线程B，则可以对线程B对应的Thread实例调用interrupt方法。如果此刻线程B正在wait/sleep/join，
 		则线程B会立刻抛出InterruptedException，在catch() {} 中直接return即可安全地结束线程。 
 		需要注意的是，InterruptedException是线程自己从内部抛出的，并不是interrupt()方法抛出的。对某一线程调用 interrupt()时，
-		如果该线程正在执行普通的代码，那么该线程根本就不会抛出InterruptedException。但是，一旦该线程进入到 wait()/sleep()/join()后，就会立刻抛出InterruptedException 。 
+		如果该线程正在执行普通的代码，那么该线程根本就不会抛出InterruptedException。但是，一旦该线程进入到 wait()/sleep()/join()后，
+		就会立刻抛出InterruptedException 。 
 	不同点 ：  
 		1.每个对象都有一个锁来控制同步访问。Synchronized关键字可以和对象的锁交互，来实现线程的同步。 
 		sleep方法没有释放锁，而wait方法释放了锁，使得其他线程可以使用同步控制块或者方法。 
 		2.wait，notify和notifyAll只能在同步控制方法或者同步控制块里面使用，而sleep可以在任何地方使用 
 		3.sleep，wait,join必须捕获异常，而notify和notifyAll不需要捕获异常 
 		4.sleep是线程类（Thread）的方法，导致此线程暂停执行指定时间，给执行机会给其他线程，但是监控状态依然保持，到时后会自动恢复。调用sleep不会释放对象锁。
-		5.wait是Object类的方法，对此对象调用wait方法导致本线程放弃对象锁,只有针对此对象发出notify方法（或notifyAll）后本线程才进入对象锁定池准备获得对象锁进入运行状态。
+		5.wait是Object类的方法，对此对象调用wait方法导致本线程放弃对象锁,只有针对此对象发出notify方法（或notifyAll）后
+		本线程才进入对象锁定池准备获得对象锁进入运行状态。
+
+14.java的字符码集：
+	java使用的是Unicode字符码，ASCII是国际使用最广泛的字符编码，BCD是一种数字压缩存储编码。Unicode中无论什么字符都是两个字节。
+
+15.java中变量的范围：
+	short -2^15  2^15-1
+	int   -2^31  2^31-1
+	long  -2^63  2^63-1
+	float  -2^31  2^31-1
+	double -2^63  2^63-1
+	boolean 默认false
+
+16.使用泛型取代非泛型的数据类型，程序的运行性能不会更好，因为java在编译阶段，虚拟机就会把泛型擦除，还原成没有泛型的代码，顶多编译时候慢点，运行时没有任何区别。
+17.java中spring：
+	Spring 框架是一个分层架构！！！由 7 个定义良好的模块组成。
+	核心容器，Spring上下文，Spring AOP， Spring DAO， Spring ORM， Spring Web， Spring MVC。这些都是spring包含的框架
+
+17.java的finalize：
+	只有当没有引用指向这个对象的时候，垃圾回收器要回收这个对象时，才会调用这个方法。
+
+18.java中的关键字
+	1，Java 关键字列表 (依字母排序 共50组)：
+		abstract, assert, boolean, break, byte, case, catch, char, class, const（保留关键字）,
+		continue, default, do, double, else, enum, extends, final, finally, float, for, goto（保留关键字）, 
+		if, implements, import, instanceof, int, interface, long, native, new, package, private, protected, public, 
+		return, short, static, strictfp, super, switch, synchronized, this, throw, throws, transient, try, void, volatile, while
+	2，保留字列表 (依字母排序 共14组)，Java保留字是指现有Java版本尚未使用，但以后版本可能会作为关键字使用：
+		byValue, cast, false, future, generic, inner, operator, outer, rest, true, var, goto （保留关键字） , const （保留关键字） , null
+
+	true和false是boolean类型的变量，是编译器赋予特殊含义的，但并不是关键字。
+
+19.截至jdk1.8，java并发框架支持的锁：
+	读写锁、自旋锁、乐观锁。
+
+20.java多线程：
+	synchronized 关键字 : 用来给对象和方法或者代码块加锁，当它锁定一个方法或者一个代码块的时候，同一时刻最多只有一个线程执行这个段代码。
+	volatile：用来确保将变量的跟新操作通知到其他线程，当把变量声明为volatile类型后，编译器与运行时都会注意到这个变量是共享的，
+		  因此不会将该变量上的操作与其他内存操作一起重排序。然而，在访问volatile变量时不会执行加锁操作，因此也就不会使执行线程阻塞，
+		  因此volatile变量是一种比 synchronized关键字更轻量级的同步机制。
+	
+21.java中join的作用：
+	等待调用join的线程执行完才执行当前线程。
+
+22.java中collection的继承结构：
+	看图
+
+23.java中字符串（重点）
+	String str1="hello";
+	String str2="he"+"llo";
+	str1==str2  //true
+	因为str1和str2都是常量，当java字符串常量池中存在hello时，str不会再生成一个新的字符串存到常量池，而是直接在常量池取"hello",所以实际上str1和str2指向同一个对象。
+	
+	String str1="hello";
+	String str2="he"+new String("llo");
+	str1==str2  //false
+	因为str1声明后，java将"hello"存在字符串常量池中，str2在声明时并不知道str2的内容是什么，所以不会放到字符串常量池中，而是放在堆中存储。
+
+24.java国际化：
+	实现国际化的常用手段是利用ResourceBundle类
+
+25.面向对象编程语言核心：
+	封装、继承、多态
+26.java中集合：
+	hashMap 允许key和value都可以为null
+	hashtable 不允许key和value为null
+
+27.object中含有的默认方法：
+	getClass(), hashCode(), equals(), clone(), toString(), notify(), notifyAll(),  wait(), finalize()
+
+28.java中堆的分配：
+	-Xmx：最大堆大小
+	-Xms：初始堆大小
+	-Xmn:年轻代大小
+	-XXSurvivorRatio：年轻代中Eden区与Survivor区的大小比值
+	年轻代5120m， Eden：Survivor=3，Survivor区大小=1024m（Survivor区有两个，即将年轻代分为5份，每个Survivor区占一份），总大小为2048m。
+	-Xms初始堆大小即最小内存值为10240m
+
+29.java中的编译问题:
+	J2SDK是编程工具，不是API.
+	Appletviewer.exe 就是用来解释执行java applet应用程序的,简单理解就是没有main函数的继承applet类的java类。
+	能被Appletviewer成功运行的java class文件没有main()方法
+
+30.java中多线程：
+	CyclicBarrier和count DownLatch都可以让一组线程等待其他线程。
+	Callable 中的call（）方法可以返回值和跑出异常（checkedException）
+
+31.java中的初始化顺序：
+	初始化父类中的静态成员和静态代码快，初始化子类中的静态成员和静态代码块。初始化父类中普通成员变量和代码块，再执行父类中的构造方法。初始化子类中的普通成员变量
+	和代码块，再执行子类中的构造方法。
+
+32.java中的标准statement
+	1.statement是最基本的用法，采用字符串拼接的方法，存在sql注入漏洞。
+	2.preparedstatement对statement中的sql语句进行预编译，同时检查合法性，效率高。
+	3.CallableStatement接口扩展PreparedStatement，用来调用存储过程，它提供了对输入和输出参数的支持，CallableStatement接口还具有对PreparedStatement接口提供的输入
+	  输出的参数支持。
+
+33.java中static变量
+	java中 static的int 默认初始值为0；
+
+34.java中Collection的线程安全：
+	HashMap和TreeMap都未考虑线程安全。
+	HashTable 和 ConcurrentHashMap都是线程安全的，只是加锁的范围不同，HashTable将整个哈希表进行加锁，而ConcurrentHashMap将哈希表分为16桶，每次对需要的桶进行加锁。
+
+35.java中的重载：
+	1.在同一个类中。
+	2.方法名相同。
+	3.方法的形参不同，具体表现为：类型、个数、顺序不同才可以重载。
+	4.比较容易忽略的点：与方法的返回类型和访问权限无关。
+
+36.java中的基本类型：
+	long a=012；true   因为是基本类型所以编译器会自动进行转型。
+	float b=-412； true  同上，      但是float b=-412.2； false  因为java中默认的浮点型为double，所以会报错。
+
+37.java中多线程：
+	一定要注意线程调用的是什么方法，如果调用的是start方法则开启一条新线程，但是如果调用的是run方法就只是普通的调用函数，会顺序执行，不会开启新线程。
+
+38.java中的静态方法：
+	java的NullPointerException是引用堆内存的对象为空时，才是空指针异常。
+	静态方法不依赖对象，所以即使对象为null也可以调用静态方法。   例如： Test t=null；t.hello();  （hello为Test类中公有静态方法）
+
+39.Hibernate优化所鼓励的7大措施：
+	1.尽量使用many-to-one，避免使用单项one-to-many
+	2.灵活使用单向one-to-many
+	3.不用一对一，使用多对一代替一对一
+	4.配置对象缓存，不使用集合缓存
+	5.一对多使用Bag 多对一使用Set
+	6.继承使用显示多态 HQL:from object polymorphism="exlicit" 避免查处所有对象
+	7.消除大表，使用二级缓存
+	
