@@ -418,6 +418,18 @@ mysql的存储引擎：
 			where actor='dsda' and title like '%sad%'）as t1 on(ti.prod_id=products.prod_id)
 
 	对于InnoDB的二级索引来说，因为二级索引都带有主键列，所以可以认为即使二级索引没有显式声明主键列，也可以在带有主键的查询应用覆盖索引。
+
+
+突发奇想的问题：
+	为什么MyISAM的count函数执行很快，而InnoDB的count函数执行的很慢（和记录数有关）？
+		因为MyISAM会记录记录数，而InnoDB没有记录记录数，而是实时统计。当有where条件的时候，就不是很快了。因为要根据条件查找后再进行统计。
+		MyISAM存储引擎在统计列数的时候，如果知道列col不可能为空的时候，内部会把count(col)转化为count(*)
+
+
+
+
+
+
 	
 
 
