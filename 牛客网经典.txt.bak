@@ -278,8 +278,9 @@ NumberFormatException		    SQLExcpetion
 	由于方法中的局部变量是在栈中，彼此各自都拥有独立的运行空间而不会互相干扰，因此才做到线程安全。
 
 44.java中的堆栈分别储存什么：
-	栈：存放基本类型变量和对象的引用
-	堆：存对象实例（new 出来的）
+	栈：局部基本类型的变量（java中定义的八种基本类型：boolean、char、byte、short、int、long、float、double）、部分的返回结果以及Stack Frame，
+	    非基本类型的对象在JVM栈上仅存放一个指向堆上的地址。
+	堆：用来存储对象实例以及数组值的区域，可以认为Java中所有通过new创建的对象的内存都在此分配
 	static域：存放所有静态变量和方法。
 	常量池：存放字符串常量和基本类型常量
 	http://www.cnblogs.com/liulipeng/archive/2013/09/13/3319675.html
@@ -331,6 +332,8 @@ NumberFormatException		    SQLExcpetion
 	https://www.nowcoder.com/test/question/done?tid=12727582&qid=14817#summary
 	链接：https://www.nowcoder.com/questionTerminal/2a1cdf3e61d14947bf00dfe10e25a2c0
 	来源：牛客网
+
+	http://www.cnblogs.com/sunada2005/p/3577799.html java虚拟机详解。
 
 	大多数 JVM 将内存区域划分为 Method Area（Non-Heap）（方法区） ,Heap（堆） , Program Counter Register（程序计数器） ,   VM Stack（虚拟机栈，也有翻译成JAVA 方法栈的）,
 	Native Method Stack  （ 本地方法栈 ），其中Method Area 和  Heap 是线程共享的  ，VM Stack，Native Method Stack  和Program Counter Register  是非线程共享的。
