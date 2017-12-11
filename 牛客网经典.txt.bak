@@ -278,11 +278,13 @@ NumberFormatException		    SQLExcpetion
 	由于方法中的局部变量是在栈中，彼此各自都拥有独立的运行空间而不会互相干扰，因此才做到线程安全。
 
 44.java中的堆栈分别储存什么：
-	栈：局部基本类型的变量（java中定义的八种基本类型：boolean、char、byte、short、int、long、float、double）、部分的返回结果以及Stack Frame，
+	栈：线程私有的，存放局部基本类型的变量（java中定义的八种基本类型：boolean、char、byte、short、int、long、float、double）、部分的返回结果以及Stack Frame，
 	    非基本类型的对象在JVM栈上仅存放一个指向堆上的地址。
 	堆：用来存储对象实例以及数组值的区域，可以认为Java中所有通过new创建的对象的内存都在此分配
-	static域：存放所有静态变量和方法。
-	常量池：存放字符串常量和基本类型常量
+	方法区：方法区域存放了所加载的类的信息（名称、修饰符等）、类中的静态变量、类中定义为final类型的常量、类中的Field信息、类中的方法信息，
+		当开发人员在程序中通过Class对象中的getName、isInterface等方法来获取信息时，这些数据都来源于方法区域，同时方法区域也是全局共享的，在一定的条件下它也会被GC，
+		当方法区域需要使用的内存超过其允许的大小时，会抛出OutOfMemory的错误信息。
+	常量池：存放的为类中的固定的常量信息、方法和Field的引用信息等，其空间从方法区域中分配。
 	http://www.cnblogs.com/liulipeng/archive/2013/09/13/3319675.html
 
 45.java中finally的执行时间：
@@ -482,6 +484,29 @@ ConcurrentHashMap使用segment来分段和管理锁，segment继承自ReentrantL
 	d)   事务超时
 	如果一个事务长时间运行，这时为了尽量避免浪费系统资源，应为这个事务设置一个有效时间，使其等待数秒后自动回滚。与设
 	置“只读”属性一样，事务有效属性也需要给那些具有可能启动新事物的传播行为的方法的事务标记成只读才有意义。
+
+
+66.java中的枚举（底层实现）
+	枚举类在后台实现时，实际上是转化为一个继承了java.lang.Enum类的实体类，原先的枚举类型变成对应的实体类型，上例中AccountType变成了个class AccountType，并且会生成一个新的构造函数，若原来有构造函数，则在此基础上添加两个参数，生成新的构造函数，如上例子中：
+	private AccountType(){ System.out.println(“It is a account type”); }
+	会变成：
+	private AccountType(String s, int i){
+	   super(s,i); System.out.println(“It is a account type”); }
+	而在这个类中，会添加若干字段来代表具体的枚举类型：
+	public static final AccountType SAVING;
+	public static final AccountType FIXED;
+	public static final AccountType CURRENT;
+
+	而且还会添加一段static代码段：
+	static{
+	SAVING = new AccountType("SAVING", 0);
+	 ...  CURRENT = new AccountType("CURRENT", 0);
+	$VALUES = new AccountType[]{
+		 SAVING, FIXED, CURRENT
+	    } }
+	以此来初始化枚举中的每个具体类型。（并将所有具体类型放到一个$VALUE数组中，以便用序号访问具体类型）
+	在初始化过程中new AccountType构造函数被调用了三次，所以Enum中定义的构造函数中的打印代码被执行了3遍。
+
 
 
 
