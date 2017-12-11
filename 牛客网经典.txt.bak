@@ -507,6 +507,13 @@ ConcurrentHashMap使用segment来分段和管理锁，segment继承自ReentrantL
 	以此来初始化枚举中的每个具体类型。（并将所有具体类型放到一个$VALUE数组中，以便用序号访问具体类型）
 	在初始化过程中new AccountType构造函数被调用了三次，所以Enum中定义的构造函数中的打印代码被执行了3遍。
 
+67.Math.round()方法：
+	底层实现为Math.floor(x+0.5);所以要记住，如果是负数的话，就不是简单的四舍五入。
+
+
+	
+
+
 
 
 

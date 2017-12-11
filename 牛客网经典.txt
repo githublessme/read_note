@@ -511,9 +511,41 @@ ConcurrentHashMap使用segment来分段和管理锁，segment继承自ReentrantL
 	底层实现为Math.floor(x+0.5);所以要记住，如果是负数的话，就不是简单的四舍五入。
 
 
-	
+68.java的垃圾回收：
+	这是一个关于java的垃圾回收机制的题目。垃圾回收主要针对的是堆区的回收，因为栈区的内存是随着线程而释放的。堆区分为三个区：年轻代（Young Generation）、年老代（Old Generation）、
+	永久代（Permanent Generation，也就是方法区）。
+
+	年轻代：对象被创建时（new）的对象通常被放在Young（除了一些占据内存比较大的对象）,经过一定的Minor GC（针对年轻代的内存回收）还活着的对象会被移动到年老代（一些具体的移动细节省略）。
+	年老代：就是上述年轻代移动过来的和一些比较大的对象。Minor GC(FullGC)是针对年老代的回收，这个很关键
+	永久代：存储的是final常量，static变量，常量池。
 
 
+	1，新生代：（1）所有对象创建在新生代的Eden区，当Eden区满后触发新生代的Minor GC，将Eden区和非空闲Survivor区存活的对象复制到另外一个空闲的Survivor区中。
+		   （2）保证一个Survivor区是空的，新生代Minor GC就是在两个Survivor区之间相互复制存活对象，直到Survivor区满为止。
+	2，老年代：当Survivor区也满了之后就通过Minor GC将对象复制到老年代。老年代也满了的话，就将触发Full GC，针对整个堆（包括新生代、老年代、持久代）进行垃圾回收。
+	3，持久代：持久代如果满了，将触发Full GC。
+
+69.jsp内置对象：
+	一共有9个内置对象
+	pageContext javax.servlet.jsp.PageContext
+	request javax.servlet.http.HttpServletRequest 
+	response javax.servlet.http.HttpServletResponse 
+	session javax.servlet.http.HttpSession 
+	application javax.servlet.ServletContext 
+	config javax.serlvet.ServletConfig 
+	exception java.lang.Throwable
+	page java.lang.Object 
+	out javax.servlet.jsp.JspWriter 
+	作用： 
+	1、pageContext 表示页容器 EL表达式、 标签 、上传 
+	2、request 服务器端取得客户端的信息：头信息 、Cookie 、请求参数 ，最大用处在MVC设计模式上 
+	3、response 服务器端回应客户端信息：Cookie、重定向 
+	4、session 表示每一个用户，用于登录验证上 
+	5、application 表示整个服务器 
+	6、config 取得初始化参数，初始化参数在web.xml文件中配置 
+	7、exception 表示的是错误页的处理操作 
+	8、page 如同this一样，代表整个jsp页面自身 
+	9、out 输出 ，但是尽量使用表达式输出
 
 
 
