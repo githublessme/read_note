@@ -650,6 +650,7 @@ ConcurrentHashMap使用segment来分段和管理锁，segment继承自ReentrantL
 
 79.java中ArrayList初始大小为10，但是ArrayList提供了构造指定大小容量的构造方法。在添加元素的时候如果超过初始大小每次扩充至当前容量的1.5倍。
    java中HashMap初始大小为16，每次扩容直接翻倍
+   java中HashTable初始大小为11，每次扩容2*old+1
 
 80.java中内部类的声明创建的方式：
 	public class Enclosingone {
@@ -688,3 +689,45 @@ ConcurrentHashMap使用segment来分段和管理锁，segment继承自ReentrantL
 	G1收集器：整体上是基于标记 整理 ，局部采用复制
 
 	综上：新生代基本采用复制算法，老年代采用标记整理算法。cms采用标记清理。
+
+83.java中Set和HashMap确保键唯一性的方法：
+	查找书  Effective Java
+
+84.java中HashTable和HashMap的区别：
+	1继承不同。
+		public class Hashtable extends Dictionary implements Map 
+		public class HashMap extends AbstractMap implements Map
+	2
+		Hashtable 中的方法是同步的，而HashMap中的方法在缺省情况下是非同步的。在多线程并发的环境下，可以直接使用Hashtable，
+		但是要使用HashMap的话就要自己增加同步处理了。
+	3
+		Hashtable中，key和value都不允许出现null值。
+		在HashMap中，null可以作为键，这样的键只有一个；可以有一个或多个键所对应的值为null。
+		当get()方法返回null值时，即可以表示 HashMap中没有该键，也可以表示该键所对应的值为null。
+		因此，在HashMap中不能由get()方法来判断HashMap中是否存在某个键， 而应该用containsKey()方法来判断。
+	4两个遍历方式的内部实现上不同。
+		Hashtable、HashMap都使用了 Iterator。而由于历史原因，Hashtable还使用了Enumeration的方式 。
+	5
+		哈希值的使用不同，HashTable直接使用对象的hashCode。而HashMap重新计算hash值。
+	6
+		Hashtable和HashMap它们两个内部实现方式的数组的初始大小和扩容的方式。HashTable中hash数组默认大小是11，增加的方式是 old*2+1。
+		HashMap中hash数组的默认大小是16，而且一定是2的指数。 
+
+85.java中switch支持什么类型
+	switch语句后的控制表达式只能是short、char、int、long整数类型和枚举类型，不能是float，double和boolean类型。String类型是java7开始支持。 
+
+86.java8中Queue
+	1、LinkedBlockingQueue：基于链接节点的可选限定的blocking queue 。 这个队列排列元素FIFO（先进先出）。 队列的头部是队列中最长的元素。 队列的尾部是队列中最短时间的元素。 新元素插入队列的尾部，队列检索操作获取队列头部的元素。 链接队列通常具有比基于阵列的队列更高的吞吐量，但在大多数并发应用程序中的可预测性能较低。
+	blocking queue说明：不接受null元素；可能是容量有限的；实现被设计为主要用于生产者 - 消费者队列；不支持任何类型的“关闭”或“关闭”操作，表示不再添加项目实现是线程安全的；
+	
+
+	2、PriorityQueue：
+	2.1、基于优先级堆的无限优先级queue 。 优先级队列的元素根据它们的有序natural ordering ，或由一个Comparator在队列构造的时候提供，这取决于所使用的构造方法。 优先队列不允许null元素。 依靠自然排序的优先级队列也不允许插入不可比较的对象（这样做可能导致ClassCastException ）。
+	2.2、该队列的头部是相对于指定顺序的最小元素。 如果多个元素被绑定到最小值，那么头就是这些元素之一 - 关系被任意破坏。 队列检索操作poll ， remove ， peek和element访问在队列的头部的元件。
+	2.3、优先级队列是无限制的，但是具有管理用于在队列上存储元素的数组的大小的内部容量 。 它始终至少与队列大小一样大。 当元素被添加到优先级队列中时，其容量会自动增长。 没有规定增长政策的细节。
+	2.4、该类及其迭代器实现Collection和Iterator接口的所有可选方法。 方法iterator()中提供的迭代器不能保证以任何特定顺序遍历优先级队列的元素。 如果需要有序遍历，请考虑使用Arrays.sort(pq.toArray()) 。
+	2.5、请注意，此实现不同步。 如果任何线程修改队列，多线程不应同时访问PriorityQueue实例。 而是使用线程安全的PriorityBlockingQueue类。
+	实现注意事项：此实现提供了O（日志（n））的时间入队和出队方法（ offer ， poll ， remove()和add ）; remove(Object)和contains(Object)方法的线性时间; 和恒定时间检索方法（ peek ， element和size ）。
+
+
+	3、ConcurrentLinkedQueue：基于链接节点的无界并发deque(deque是双端队列) 。 并发插入，删除和访问操作可以跨多个线程安全执行。 A ConcurrentLinkedDeque是许多线程将共享对公共集合的访问的适当选择。像大多数其他并发集合实现一样，此类不允许使用null元素。
