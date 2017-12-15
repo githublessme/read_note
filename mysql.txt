@@ -4,3 +4,27 @@
 	ON DELETE RESTRICT 的意思是 删除外键对应的表数据时，如果有关联到该外键的数据，则不允许删除对应数据。
 	ON UPDATE CASCADE  的意思是 在更新外键对应的表数据时，如果有关联到该外键的数据时，这条记录对应的外键也要更新
 
+2.开启/关闭外键约束
+	set foreign_key_checks=0;关闭外键约束
+	set foreign_key_checks=1;开启外键约束
+
+3.InnoDB的两种存储方式：
+	共享空间存储：表结构存在.frm文件中，数据和索引存在innodb_data_home_dir和innodb_data_file_path定义的表空间中，可以是多个文件。
+	多表空间存储：表结构存在.frm文件中，数据和索引存在.ibd中。如果是分区表，每个分区对应单独的.ibd文件，文件名是表名+分区名。
+	如果更改存储方式，不影响之前数据的存储方式，新数据按新的存储方式进行存储。
+
+4.Merge存储引擎：
+	实际上是一组MyISAM表的组合，这些表必须结构完全相同。
+
+5.mysql查看表详细信息（系统信息）
+	1、进去指定schema 数据库（存放了其他的数据库的信息）
+	use information_schema
+	2、查询所有数据的大小
+	select concat(round(sum(DATA_LENGTH/1024/1024),2),'MB') as data  from TABLES
+	3、查看指定数据库的大小
+	比如说 数据库apoyl
+	select concat(round(sum(DATA_LENGTH/1024/1024),2),'MB') as data  from TABLES where table_schema='apoyl';
+	4、查看指定数据库的表的大小
+	比如说 数据库apoyl 中apoyl_test表
+	select concat(round(sum(DATA_LENGTH/1024/1024),2),'MB') as data  from TABLES where table_schema='apoyl' and table_name='apoyl_test';
+

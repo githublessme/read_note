@@ -713,6 +713,9 @@ ConcurrentHashMap使用segment来分段和管理锁，segment继承自ReentrantL
 		Hashtable和HashMap它们两个内部实现方式的数组的初始大小和扩容的方式。HashTable中hash数组默认大小是11，增加的方式是 old*2+1。
 		HashMap中hash数组的默认大小是16，而且一定是2的指数。 
 
+	7
+		HashMap只有containsKey和containsValue方法，没有contains方法。而HashTable三个方法都包含。
+
 85.java中switch支持什么类型
 	switch语句后的控制表达式只能是short、char、int、long整数类型和枚举类型，不能是float，double和boolean类型。String类型是java7开始支持。 
 
@@ -731,3 +734,85 @@ ConcurrentHashMap使用segment来分段和管理锁，segment继承自ReentrantL
 
 
 	3、ConcurrentLinkedQueue：基于链接节点的无界并发deque(deque是双端队列) 。 并发插入，删除和访问操作可以跨多个线程安全执行。 A ConcurrentLinkedDeque是许多线程将共享对公共集合的访问的适当选择。像大多数其他并发集合实现一样，此类不允许使用null元素。
+	
+87.java反射机制中：
+	public Method[] getDeclaredMethods()
+		返回类或接口声明的所有方法，包括public, protected, default (package) 访问和private方法的Method对象，但不包括继承的方法。当然也包括它所实现接口的方法。
+	public Method[] getMethods()
+		返回类的所有public方法，包括其继承类的公用方法，当然也包括它所实现接口的方法。
+
+88.java中双亲委托模型：
+	JVM加载类的实现方式，我们称为 双亲委托模型：
+
+	如果一个类加载器收到了类加载的请求，他首先不会自己去尝试加载这个类，而是把这个请求委托给自己的父加载器，每一层的类加载器都是如此，因此所有的类加载请求最终都应该传送到顶层的Bootstrap ClassLoader中，只有当父加载器反馈自己无法完成加载请求时，子加载器才会尝试自己加载。
+	双亲委托模型的重要用途是为了解决类载入过程中的安全性问题。
+
+	假设有一个开发者自己编写了一个名为Java.lang.Object的类，想借此欺骗JVM。现在他要使用自定义ClassLoader来加载自己编写的java.lang.Object类。然而幸运的是，双亲委托模型不会让他成功。因为JVM会优先在Bootstrap ClassLoader的路径下找到java.lang.Object类，并载入它
+
+
+89.java中ThreadLocal：
+	1.ThreadLocal存放的值是线程封闭，线程间互斥的，主要用于线程内共享一些数据，避免通过参数来传递
+
+	2.线程的角度看，每个线程都保持一个对其线程局部变量副本的隐式引用，只要线程是活动的并且 ThreadLocal 实例是可访问的；
+	在线程消失之后，其线程局部实例的所有副本都会被垃圾回收
+
+	3.在Thread类中有一个Map，用于存储每一个线程的变量的副本。
+	4.对于多线程资源共享的问题，同步机制采用了“以时间换空间”的方式，而ThreadLocal采用了“以空间换时间”的方式
+
+90.java中String、StringBuffer、StringBuilder
+	StringBuffer是线程安全的。
+
+	StringBuilder不是线程安全的，需要自己进行同步处理。
+
+	String在改变的时候会生成新对象并将指针指向新对象，而StringBuilder在改变的时候直接改变指向的对象，不需要重新新建对象。
+
+	在效率上来说：String<StringBuffer<StringBuiler  但是在String s="adasas"+"dasda"+"asdasd"的情况下， String效率最高，因为这种情况下字符串s直接解析为String s="adasasdasdaasdasd";
+
+
+91.java对象初始化顺序：
+	最先初始化静态域而不是静态代码块，静态域初始化顺序  静态代码块=静态变量>静态方法   静态代码块和静态变量的初始化顺序由它俩的位置决定。
+	然后初始化，非静态变量   最后进入初始化函数。
+
+
+92.java类加载顺序：
+	1.首先，需要明白类的加载顺序。
+	(1) 父类静态代码块(包括静态初始化块，静态属性，但不包括静态方法)
+	(2) 子类静态代码块(包括静态初始化块，静态属性，但不包括静态方法 )
+	(3) 父类非静态代码块( 包括非静态初始化块，非静态属性 )
+	(4) 父类构造函数
+	(5) 子类非静态代码块 ( 包括非静态初始化块，非静态属性 )
+	(6) 子类构造函数
+	其中：类中静态块按照声明顺序执行，并且(1)和(2)不需要调用new类实例的时候就执行了(意思就是在类加载到方法区的时候执行的)
+	2.其次，需要理解子类覆盖父类方法的问题，也就是方法重写实现多态问题。
+	Base b = new Sub();它为多态的一种表现形式，声明是Base,实现是Sub类， 理解为 b 编译时表现为Base类特性，运行时表现为Sub类特性。
+	当子类覆盖了父类的方法后，意思是父类的方法已经被重写，题中 父类初始化调用的方法为子类实现的方法，子类实现的方法中调用的baseName为子类中的私有属性。
+	由1.可知，此时只执行到步骤4.,子类非静态代码块和初始化步骤还没有到，子类中的baseName还没有被初始化。所以此时 baseName为空。 所以为null。
+
+	public class Base
+	{
+	    private String baseName = "base";
+	    public Base()
+	    {
+		callName();
+	    }
+	 
+	    public void callName()
+	    {
+		System. out. println(baseName);
+	    }
+	 
+	    static class Sub extends Base
+	    {
+		private String baseName = "sub";
+		public void callName()
+		{
+		    System. out. println (baseName) ;
+		}
+	    }
+	    public static void main(String[] args)
+	    {
+		Base b = new Sub();
+	    }
+	}
+
+93.

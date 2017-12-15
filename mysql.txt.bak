@@ -1,0 +1,6 @@
+1.外键约束：
+	CONSTRAINT `fk_city_country` FOREIGN KEY (country_id) REFERENCES country (country_id) ON DELETE RESTRICT ON UPDATE CASCADE
+		       约束名称                    外键名称                 country表中键的名称   
+	ON DELETE RESTRICT 的意思是 删除外键对应的表数据时，如果有关联到该外键的数据，则不允许删除对应数据。
+	ON UPDATE CASCADE  的意思是 在更新外键对应的表数据时，如果有关联到该外键的数据时，这条记录对应的外键也要更新
+
