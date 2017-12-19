@@ -44,7 +44,7 @@ NumberFormatException		    SQLExcpetion
 	b3=(b1+b2)   是错误的，因为在计算时，byte会被转换为int类型进行计算，在计算完应该使用强转  正确格式：b3=(byte)(b1+b2);
 	但是当变量是final类型就不会在计算时进行类型转换。
 	例如：final byte b4=4,b5=5;  b3=b4+b5;
-10.java中线程安全类：简单记忆线程安全的集合类： 喂！SHE！  喂是指  vector，S是指 stack， H是指    hashtable，E是指：Eenumeration
+10.java中线程安全类：简单记忆线程安全的集合类： 喂！SHE！  喂是指  vector，S是指 stack， H是指    hashtable，E是指：Eenumeration   还要加上properties
 
 11.java中加载器：
 	1）Bootstrap ClassLoader引导类加载器，加载java的核心库，使用原生代码实现的
@@ -815,4 +815,14 @@ ConcurrentHashMap使用segment来分段和管理锁，segment继承自ReentrantL
 	    }
 	}
 
-93.
+93.java实现线程的等待和唤醒：
+	wait()、notify()和notifyAll()是 Object类 中的方法 ；
+
+	Condition是在java 1.5中才出现的，它用来替代传统的Object的wait()、notify()实现线程间的协作，相比使用Object的wait()、 notify()，
+	使用Condition的await()、signal()这种方式实现线程间协作更加安全和高效。 
+
+94.java中ResultSet的索引从1开始
+
+95.&在逻辑中是非短路与，在位运算中是按位与。
+
+96.
