@@ -825,4 +825,16 @@ ConcurrentHashMap使用segment来分段和管理锁，segment继承自ReentrantL
 
 95.&在逻辑中是非短路与，在位运算中是按位与。
 
-96.
+96.java中声明数组的方式：
+	1.必须要定义一个维度的长度。如：int a[][]=new int[][];这样就是错误的    正确格式：int a[][]=new int[][2];
+	2.变量名的定义[]可以放在任意位置 比如： int [][]a []a[] 都是正确的格式.
+
+97.对象序列化：
+	1.类实现serializable接口，如果成员变量不是基本类型，那么成员变量也要实现serializable接口。
+	2.使用transient修饰的变量不会进行序列化。
+	3.要使用ObjectOutputStream来进行传输。
+
+98.System.out.println()方法：
+	System是java.lang包下的一个类，out为System的final静态成员（PrintStream类型），println()是PrintStream类的实例方法。
+
+99.

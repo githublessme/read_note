@@ -837,4 +837,7 @@ ConcurrentHashMap使用segment来分段和管理锁，segment继承自ReentrantL
 98.System.out.println()方法：
 	System是java.lang包下的一个类，out为System的final静态成员（PrintStream类型），println()是PrintStream类的实例方法。
 
-99.
+99.在java中，当方式调用完成，并不会由垃圾收集器收回方法占用的内存，因为在调用方法的时候，会在栈中生成对应的栈帧。所以，方法调用结束后应该是栈帧出栈，而不是回收内存。
+   因为这个方法的信息有可能会被其他对象使用。
+
+100.
