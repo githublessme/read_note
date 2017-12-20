@@ -680,7 +680,9 @@ ConcurrentHashMap使用segment来分段和管理锁，segment继承自ReentrantL
 	新生代：初始对象，生命周期短的
 	永久代：长时间存在的对象
 	整个java的垃圾回收是新生代和年老代的协作，这种叫做分代回收。
-	P.S：Serial New收集器是针对新生代的收集器，采用的是复制算法
+	
+	P.S：
+	Serial New收集器是针对新生代的收集器，采用的是复制算法
 	Parallel New（并行）收集器，新生代采用复制算法，老年代采用标记整理
 	Parallel Scavenge（并行）收集器，针对新生代，采用复制收集算法
 	Serial Old（串行）收集器，新生代采用复制，老年代采用标记整理
