@@ -44,7 +44,7 @@ NumberFormatException		    SQLExcpetion
 	b3=(b1+b2)   是错误的，因为在计算时，byte会被转换为int类型进行计算，在计算完应该使用强转  正确格式：b3=(byte)(b1+b2);
 	但是当变量是final类型就不会在计算时进行类型转换。
 	例如：final byte b4=4,b5=5;  b3=b4+b5;
-10.java中线程安全类：简单记忆线程安全的集合类： 喂！SHE！  喂是指  vector，S是指 stack， H是指    hashtable，E是指：Eenumeration
+10.java中线程安全类：简单记忆线程安全的集合类： 喂！SHE！  喂是指  vector，S是指 stack， H是指    hashtable，E是指：Eenumeration   还要加上properties
 
 11.java中加载器：
 	1）Bootstrap ClassLoader引导类加载器，加载java的核心库，使用原生代码实现的
@@ -680,7 +680,9 @@ ConcurrentHashMap使用segment来分段和管理锁，segment继承自ReentrantL
 	新生代：初始对象，生命周期短的
 	永久代：长时间存在的对象
 	整个java的垃圾回收是新生代和年老代的协作，这种叫做分代回收。
-	P.S：Serial New收集器是针对新生代的收集器，采用的是复制算法
+	
+	P.S：
+	Serial New收集器是针对新生代的收集器，采用的是复制算法
 	Parallel New（并行）收集器，新生代采用复制算法，老年代采用标记整理
 	Parallel Scavenge（并行）收集器，针对新生代，采用复制收集算法
 	Serial Old（串行）收集器，新生代采用复制，老年代采用标记整理
@@ -758,3 +760,100 @@ ConcurrentHashMap使用segment来分段和管理锁，segment继承自ReentrantL
 
 	3.在Thread类中有一个Map，用于存储每一个线程的变量的副本。
 	4.对于多线程资源共享的问题，同步机制采用了“以时间换空间”的方式，而ThreadLocal采用了“以空间换时间”的方式
+
+90.java中String、StringBuffer、StringBuilder
+	StringBuffer是线程安全的。
+
+	StringBuilder不是线程安全的，需要自己进行同步处理。
+
+	String在改变的时候会生成新对象并将指针指向新对象，而StringBuilder在改变的时候直接改变指向的对象，不需要重新新建对象。
+
+	在效率上来说：String<StringBuffer<StringBuiler  但是在String s="adasas"+"dasda"+"asdasd"的情况下， String效率最高，因为这种情况下字符串s直接解析为String s="adasasdasdaasdasd";
+
+
+91.java对象初始化顺序：
+	最先初始化静态域而不是静态代码块，静态域初始化顺序  静态代码块=静态变量>静态方法   静态代码块和静态变量的初始化顺序由它俩的位置决定。
+	然后初始化，非静态变量   最后进入初始化函数。
+
+
+92.java类加载顺序：
+	1.首先，需要明白类的加载顺序。
+	(1) 父类静态代码块(包括静态初始化块，静态属性，但不包括静态方法)
+	(2) 子类静态代码块(包括静态初始化块，静态属性，但不包括静态方法 )
+	(3) 父类非静态代码块( 包括非静态初始化块，非静态属性 )
+	(4) 父类构造函数
+	(5) 子类非静态代码块 ( 包括非静态初始化块，非静态属性 )
+	(6) 子类构造函数
+	其中：类中静态块按照声明顺序执行，并且(1)和(2)不需要调用new类实例的时候就执行了(意思就是在类加载到方法区的时候执行的)
+	2.其次，需要理解子类覆盖父类方法的问题，也就是方法重写实现多态问题。
+	Base b = new Sub();它为多态的一种表现形式，声明是Base,实现是Sub类， 理解为 b 编译时表现为Base类特性，运行时表现为Sub类特性。
+	当子类覆盖了父类的方法后，意思是父类的方法已经被重写，题中 父类初始化调用的方法为子类实现的方法，子类实现的方法中调用的baseName为子类中的私有属性。
+	由1.可知，此时只执行到步骤4.,子类非静态代码块和初始化步骤还没有到，子类中的baseName还没有被初始化。所以此时 baseName为空。 所以为null。
+
+	public class Base
+	{
+	    private String baseName = "base";
+	    public Base()
+	    {
+		callName();
+	    }
+	 
+	    public void callName()
+	    {
+		System. out. println(baseName);
+	    }
+	 
+	    static class Sub extends Base
+	    {
+		private String baseName = "sub";
+		public void callName()
+		{
+		    System. out. println (baseName) ;
+		}
+	    }
+	    public static void main(String[] args)
+	    {
+		Base b = new Sub();
+	    }
+	}
+
+93.java实现线程的等待和唤醒：
+	wait()、notify()和notifyAll()是 Object类 中的方法 ；
+
+	Condition是在java 1.5中才出现的，它用来替代传统的Object的wait()、notify()实现线程间的协作，相比使用Object的wait()、 notify()，
+	使用Condition的await()、signal()这种方式实现线程间协作更加安全和高效。 
+
+94.java中ResultSet的索引从1开始
+
+95.&在逻辑中是非短路与，在位运算中是按位与。
+
+96.java中声明数组的方式：
+	1.必须要定义一个维度的长度。如：int a[][]=new int[][];这样就是错误的    正确格式：int a[][]=new int[][2];
+	2.变量名的定义[]可以放在任意位置 比如： int [][]a []a[] 都是正确的格式.
+
+97.对象序列化：
+	1.类实现serializable接口，如果成员变量不是基本类型，那么成员变量也要实现serializable接口。
+	2.使用transient修饰的变量不会进行序列化。
+	3.要使用ObjectOutputStream来进行传输。
+
+98.System.out.println()方法：
+	System是java.lang包下的一个类，out为System的final静态成员（PrintStream类型），println()是PrintStream类的实例方法。
+
+99.在java中，当方式调用完成，并不会由垃圾收集器收回方法占用的内存，因为在调用方法的时候，会在栈中生成对应的栈帧。所以，方法调用结束后应该是栈帧出栈，而不是回收内存。
+   因为这个方法的信息有可能会被其他对象使用。
+
+100.
+	1.抽象方法只能定义在抽象类中，抽象方法和抽象类必须由abstract修饰，abstract关键字只能描述类和方法，不能描述变量。
+	抽象方法只定义方法声明，不定义方法实现。抽象类不可以被实例化（创建对象），只有通过子类继承抽象类并覆盖抽象类中的所有抽象方法后，该子类才可以被实例化，
+	否则该子类还是一个抽象类。抽象类中有构造函数用于给子类对象进行初始化，同时抽象类中可以含有非抽象方法。
+	abstract关键字不可以与final，private,static关键字共存，因为被final修饰的方法不可以被重写，意味着子类不可以重写该方法，
+	如果abstract和final共同修饰父类中的方法，子类要实现抽象方法（abstract的作用），而final又不让该方法重写，这相互矛盾。
+	如果private和abstract共同修饰父类中的方法，private修饰则该方法不可以被子类访问，但是abstract修饰需要子类去实现，两者产生矛盾。
+	如果static和abstract共同修饰父类中的方法，static表示是静态的方法，随着类的加载而加载，则该方法不需要在子类中去实现，这与abstract关键字矛盾。 
+
+	2.static用于修饰成员变量和成员函数，想要实现对象中的共性数据的对象共享，可以将这个数据进行静态修饰，被静态修饰的成员可以直接被类名调用，静态随着类的加载而加载，
+	而且优先于对象存在。静态方法只能访问静态成员（静态方法和静态变量），不可以访问非静态成员，这是因为静态方法加载时，优先于对象存在，所以没有办法访问对象中的成员。
+	静态方法中不能使用this和super关键字，因为this代表本类对象，super代表父类对象，而静态时，有可能没有对象存在，所以this和super无法使用。 
+
+	3.final关键字可以修饰类，方法，变量（成员变量内，局部变量，静态变量），被final修饰的类是一个最终类，不可以被继承，被final修饰的方法是一个最终方法，不可以被覆盖，
+	但是可以被继承。被final修饰的变量只能是一个常量，只能赋值一次。内部类被定义在类中的局部位置上时，只能访问局部被final修饰的局部变量。
