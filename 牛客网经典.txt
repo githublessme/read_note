@@ -865,4 +865,4 @@ ConcurrentHashMap使用segment来分段和管理锁，segment继承自ReentrantL
 
 	总结：jdk1,6常量池放在方法区，jdk1.7常量池放在堆内存，jdk1.8放在元空间里面，和堆相独立。所以导致string的intern方法因为以上变化在不同版本会有不同表现。
 
-102.
+102.servlet中doPost和doGet都是在javax.servlet.http.httpServlet中实现的。
