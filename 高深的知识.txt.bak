@@ -371,8 +371,23 @@ java虚拟机运行时数据区：
 	100.667:[Full GC [Tenured: 0K->210K(10240K), 0.0149142 secs] 4603K->210K(19456K). [Perm : 2999K->2999K(21248K)]. 0.0150007 secs] [Times:user=0.01 sys=0.00, real =0.02 secs]
 
 	最前面的数字33.125和100.667代表GC发生的时间（从虚拟机启动开始经过的秒数）。
+
 	GC日志开头的[GC 和[Full GC 是这次垃圾收集停顿的类型，full GC是STW的。如果新生代也发生了Full GC可能是分配担保失败。
-			
+
+	[DefNew [Perm [Tenured 是GC发生的区域，这里显示的区域名是和使用的GC收集器是密切相关的。例如，Serial收集器，新生代收集就是DefNew。ParNew收集器对应[ParNew，
+	Parallel scavenge对应PSYoungGen。
+
+	3324K->152k(3712k)（在[]内就是指定内存区域）的含义是  GC前该内存区域已使用的容量->GC该内存区已使用容量（该内存区域总容量）。
+
+	4603k->210k(19456k)（没在[]内就是整个java堆的内存情况）的含义是  GC前java堆已使用的容量->GC后java堆已使用的容量(java堆总容量)。
+
+	0.0025925 secs代表该内存区域GC所占用的时间，单位为秒。   有的收集器会给出更具体的时间，如“[Times:user=0.01 sys=0.00,real=0.02 secs]”，user代表用户态CPU时间
+	sys代表内核态CPU消耗时间，real代表墙钟时间，包括非运算的等待耗时。CPU时间则不包括，但是CPU时间会把多个CPU耗时叠加。所以经常看到user或sys超过real的情况。
+
+
+13.内存分配和回收策略：
+	
+	
 		
 
 		
