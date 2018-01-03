@@ -3,3 +3,5 @@ java虚拟机详解:
 链接：http://pan.baidu.com/s/1hrJVsSc   密码：w6u6
 链接：https://pan.baidu.com/s/1kVtID4j  密码：e3ye
 http://www.cnblogs.com/gaizai/
+
+https://backlog.com/git-tutorial/cn/intro/intro1_1.html git学习
