@@ -575,7 +575,44 @@ java虚拟机运行时数据区：
 
 		
 		1.Code属性：
+			Code属性的数据结构：
+
+				u2		attribute_name_index		1个			
+				u4		attribute_length		1个			
+				u2		max_stack			1个			//操作数栈深度最大值
+				u2		max_locals			1个			//局部变量表存储空间,单位为slot
+				u4		code_length			1个			
+				u1		code				code_length个		//字节码指令的一系列字节流，最重要的一部分
+				u2		exception_table_length		1个			
+				exception_info	exception_table			exception_table_length个
+				u2		attributes_count		1个
+				attribute_info	attributes			attributes_count个	
+
+				max_stack：是操作数深度的最大值，虚拟机根据这个来分配栈帧中操作栈深度。
+				max_locals：是局部变量表所需的存储空间。单位是slot（1 slot=4B=32bit=32位）。不超过32位的用1个slot，double和long用2个slot。
+					    ！实例方法中隐藏的this、trycatch中定义的异常、方法体中定义的局部变量都存储在局部变量表中。
+					   （！slot可以重用，当一个变量超出作用域的时候，这个变量的slot可以被其他变量使用，所以不是简单的相加就能算出max_locals）
+				code_length和code：用来存储java源程序编译后的字节码指令，每个指令占u1（范围是0-255，所以最多256个指令）。虚拟机读到一个指令就可以知道这个
+				                   指令后面是否需要参数，参数如何理解。
+					           code_length是u4，最大能到2的32次-1，但是虚拟机规定不超过65535条字节码指令，超出的话，java编译器拒绝编译。
+					           具体见书P415（指令集详细）
 			
+
+			Code属性是class文件最重要的一个属性，java程序的信息分为两部分：代码（Code，方法体里的代码）和元数据（Metadata，包括类、字段、方法定义及其他信息）
+			两部分的话，那么在整个class文件中，Code属性用来描述代码，其他所有数据项目都用于描述元数据。
+
+			java虚拟机执行字节码指令是基于栈的体系结构。但是和一般的基于堆栈的零字节指令不太一样，后面可能会带有指令需要的参数。
+			见书P184有实例讲解，便于理解。
+
+			虽然方法中没有局部变量，但是ArgsSize为1，这是为什么？
+				因为java中可以通过方法访问到这个方法所属的对象，而其实现很简单，就是在编译的时候在方法的局部变量表中加上一个this引用，指向这个方法的对象。
+				这个处理方法只对实例方法有效，类方法（static方法）不会保存this引用。
+				
+
+			
+
+
+
 			
 		
 		
