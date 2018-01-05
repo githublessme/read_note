@@ -607,6 +607,103 @@ java虚拟机运行时数据区：
 			虽然方法中没有局部变量，但是ArgsSize为1，这是为什么？
 				因为java中可以通过方法访问到这个方法所属的对象，而其实现很简单，就是在编译的时候在方法的局部变量表中加上一个this引用，指向这个方法的对象。
 				这个处理方法只对实例方法有效，类方法（static方法）不会保存this引用。
+			
+
+			异常表（exception_table）：
+				数据结构：
+					u2		start_pc		1个		//捕捉异常的开始行数
+					u2		end_pc			1个		//捕捉异常的结束行数
+					u2		handler_pc		1个		//出现异常后，跳转到多少行继续执行
+					u2		catch_type		1个		//指向常量池中的一个Class_info
+
+				如果字节码在第start_pc行到end_pc行之间（不含end_pc行）出现了类型为catch_type或者其子类的异常，就跳转到handler_pc行继续处理。当catch_type
+				的值为0时，代表任意异常都需要转向到handler_pc处进行处理。
+			
+			public int inc(){
+				int x;
+				try{
+					x=1;
+					return x;
+				}catch(Exception e){
+					x=2;
+					return x;
+				}
+				finally{
+					x=3;
+				}
+			}
+			方法正常返回1，捕捉到异常返回2，非正常退出没有返回值。
+			在finally中虽然把x设为3，但是并没有把它的值保存到本地变量表中（returnValue），所以返回的时候还是1或者2。
+
+
+		2.Exceptions属性：
+			和上面的异常表不同，这个Exceptions属性是列举出方法中可能抛出的受查异常（checked Exception），也就是方法描述时throws关键字后面列举的异常。
+
+			数据结构：
+				u2		attribute_name_index		1个			
+				u4		attribute_length		1个			//内存中的长度
+				u2		number_of_exceptions		1个			//方法抛出number_of_exceptions个异常
+				u2		exception_index_table		number_of_exceptions个   //指向常量池中一个Class_info表
+
+		3.LineNumberTable属性：
+			用于描述java源码行号与字节码行号（字节码偏移量）之间的对应关系。
+			在javac中分别使用-g:none或-g:lines来取消要求生成这个信息，如果不生成，当抛出异常的时候不会显示行号。在调试程序的时候无法设置断点。
+		
+			数据结构：
+				u2			attribute_name_index		1个			
+				u4			attribute_length		1个			//内存中的长度
+				u2			line_number_table_length	1个
+				line_number_info	line_number_table		line_number_table_length个
+
+				line_number_info数据结构：
+					u2		start_pc		1个	//字节码行号
+					u2		line_number		1个	//java源码行号
+
+					作用就是将java源码和字节码对应起来。
+			
+		4.LocalVariableTable属性：
+			用于描述栈帧中局部变量表中的变量与java源码中定义的变量之间的关系。
+			在javac中分别使用-g:none或-g:vars来取消或生成这个信息。如果不生成，在其他人引用这个方法时，所有参数名都会丢失，用args0、args1代替。对程序运行没有
+			影响，但是对编码效率有影响。
+
+			数据结构：
+				u2			attribute_name_index		1个			
+				u4			attribute_length		1个			//内存中的长度
+				u2			local_variable_table_length	1个
+				local_variable_info	local_variable_table		local_variable_table_length个
+
+				local_variable_info数据结构：
+					u2		start_pc			1
+					u2		length				1
+					u2		name_index			1
+					u2		descriptor_index		1
+					u2		index				1
+
+					start_pc和length记录局部变量生命周期开始的字节码偏移量及其作用范围覆盖的长度，两者结合起来就是局部变量在字节码中的生命周期。
+					name_index和descriptor_index都是指向常量池中的utf8_info，代表局部变量的简单名称和描述符。
+					index是局部变量在栈帧布局变量表中slot的位置。当类型是64位时，占用index、index+1两个slot。
+			
+			jdk1.5之后，LocalVariableTable属性增加了一个“姐妹属性”LocalVariableTypeTable，这是把LocalVariableTable的descriptor_index换成了Signature（特征签名）
+			，对应非泛型来说，描述符和特征签名一样，但是泛型引入后，由于描述符中泛型的参数化类型要被擦除，描述符就无法精确描述泛型类型了，所以就出现了
+			LocalVariableTypeTable。
+
+		5.SourceFile属性：
+			用于记录生成这个class文件的源码文件名称。
+			用-g:none或-g:source来关闭或要求生成这个信息。
+			关闭的话，出现异常不会显示文件名称。
+
+			数据结构：
+				u2			attribute_name_index		1个			
+				u4			attribute_length		1个			//内存中的长度
+				u2			sourcefile_index		1个			//指向常量池中utf8_info（文件名）
+		
+		6.ConstantValue属性：
+			通知虚拟机自动为静态变量赋值。只有static修饰的变量（类变量）才能使用这个属性。
+
+			类中的实例变量在实例构造器<init>方法中进行的，而对于类变量则有两种方式可以选择：在类构造器<clinit>方法中或使用ConstantValue属性。
+			目前编译器选择是：如果同时使用final和static修饰变量，并且数据类型是基本类型或String的话，就用ConstantValue来赋值，否则用<clinit>。
+						
+		
 				
 
 			

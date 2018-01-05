@@ -701,8 +701,58 @@ java虚拟机运行时数据区：
 			通知虚拟机自动为静态变量赋值。只有static修饰的变量（类变量）才能使用这个属性。
 
 			类中的实例变量在实例构造器<init>方法中进行的，而对于类变量则有两种方式可以选择：在类构造器<clinit>方法中或使用ConstantValue属性。
-			目前编译器选择是：如果同时使用final和static修饰变量，并且数据类型是基本类型或String的话，就用ConstantValue来赋值，否则用<clinit>。
-						
+			目前编译器选择是：如果同时使用final和static修饰变量(final要求是编译器自己加的，和虚拟机无关)，并且数据类型是基本类型或String的话，就用ConstantValue来赋值，
+			否则用<clinit>。
+
+			数据结构：
+				u2			attribute_name_index		1个			
+				u4			attribute_length		1个			//内存中的长度
+				u2			constantvalue_index		1个			//指向常量池中基本类型info和string_info
+
+		7.InnerClasses属性：
+			数据结构：
+				u2			attribute_name_index		1个			
+				u4			attribute_length		1个			//内存中的长度
+				u2			number_of_classes		1个
+				inner_classes_info	inner_classes			number_of_classes个	
+
+				
+				inner_classes_info数据结构：
+					u2		inner_class_info_index		1		//指向常量池中class_info
+					u2		outer_class_info_index		1		//指向常量池中class_info
+					u2		inner_name_index		1		//指向utf8_info，代表这个内部类的名称，匿名内部类为0
+					u2		inner_class_access_flags	1		//内部类的标识位，修饰符啥的。
+
+		
+
+		8.Deprecated和Synthetic属性：
+			deprecated用于表示某个类、字段或方法已经被程序作者定为不再推荐使用，它可以通过在代码中使用@deprecated注解进行设置。
+			Synthetic用于表示此字段或方法不是由java源码直接产生的，而是编译器自行添加的。
+			
+		
+		9.StackMapTable属性（位于Code属性的属性表中）：
+			这个属性会在虚拟机加载类的字节码时的验证阶段被新类型检查验证器使用，
+			这个属性描述了方法体中所有的基本块开始时本地变量表和操作栈应有的状态。在字节码验证期间就不用根据程序推导这些状态的合法性，直接检查这个属性合法性即可。
+
+			StackMapTable中包含零至多个栈映射帧，每个栈映射帧都代表了一个字节码偏移量，用于表示执行到该字节码时局部变量表和操作数栈的验证类型，类型检查验证器
+			会通过检查目标方法的局部变量表和操作数栈所需要的类型来确定一段字节码指令是否符合逻辑约束。
+
+			数据结构：
+				u2			attribute_name_index		1个			
+				u4			attribute_length		1个			//内存中的长度
+				u2			number_of_entries		1个
+				stack_map_frame		stack_map_frame_entries		number_of_entries个
+
+		
+		10.Signature属性（类、字段、方法表中）：
+			貌似是在LocalVariableTypeTable中也有Signature，先存疑，后解决。
+			记录泛型签名信息，因为java泛型采用的是擦除法（实现简单，对虚拟机改动小，节省运行内存）。
+
+			数据类型：
+				u2			attribute_name_index		1个			
+				u4			attribute_length		1个			//内存中的长度
+				u2			signature_index			1个			//指向常量池中utf8_info，根据类型存放不同的描述信息。
+
 		
 				
 
