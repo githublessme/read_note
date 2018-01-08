@@ -7,3 +7,5 @@ http://www.cnblogs.com/gaizai/
 https://backlog.com/git-tutorial/cn/intro/intro1_1.html git学习
 
 http://learning.happymmall.com/  MMall下载
+
+http://mirrors.sina.cn/centos/6.8/isos/x86_64/CentOS-6.8-x86_64-bin-DVD1to2.torrent centOS6.8种子
