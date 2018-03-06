@@ -1,4 +1,4 @@
-1.java中整形默认是int 浮点型默认是double，所以 float f=1.1;  int i=3.0  都是需要强转的。   float正确的定义格式为 float f=0.1f; 要用f来告诉java这个是float类型的小数
+﻿1.java中整形默认是int 浮点型默认是double，所以 float f=1.1;  int i=3.0  都是需要强转的。   float正确的定义格式为 float f=0.1f; 要用f来告诉java这个是float类型的小数
 2.多线程：java中使用wait必须捕捉异常 而且调用wait或notify方法必须采用当前锁调用,即必须采用synchronized中的对象
 3.Java标识符由数字、字母、下划线(_)、美元符号($)或人民币(¥)组成，首位不能是数字。并且Java关键字不能作为标识符。
 4.java方法覆盖原则：
@@ -16,7 +16,7 @@
 	变量都是 public static final 的，方法都是 public abstract的
 	java8之后，interface中可以定义 default 方法和static 方法，static 方法只能通过接口名调用，不能通过实现类名调用。default方法只能通过接口实例调用，并且可以在实现类中覆盖。
 		两个接口拥有相同的static方法没关系，可以通过接口类名区分。但是拥有两个相同的default方法就必须在实现类中覆盖这个方法，否则编译器报错。
-
+ 	
 7.java的异常结构：
 				Throwable
 				/       \
@@ -117,7 +117,7 @@ NumberFormatException		    SQLExcpetion
 		本线程才进入对象锁定池准备获得对象锁进入运行状态。
 
 14.java的字符码集：
-	java使用的是Unicode字符码，ASCII是国际使用最广泛的字符编码，BCD是一种数字压缩存储编码。Unicode中无论什么字符都是两个字节。
+	java使用的是Unicode字符码，ASCII是国际使用最广泛的字符编码，BCD是一种数字压缩存储编码。Unicode中字母一字节，汉字两字节。
 
 15.java中变量的范围：
 	short -2^15  2^15-1
