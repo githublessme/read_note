@@ -1,0 +1,868 @@
+1.java中整形默认是int 浮点型默认是double，所以 float f=1.1;  int i=3.0  都是需要强转的。   float正确的定义格式为 float f=0.1f; 要用f来告诉java这个是float类型的小数
+2.多线程：java中使用wait必须捕捉异常 而且调用wait或notify方法必须采用当前锁调用,即必须采用synchronized中的对象
+3.Java标识符由数字、字母、下划线(_)、美元符号($)或人民币(¥)组成，首位不能是数字。并且Java关键字不能作为标识符。
+4.java方法覆盖原则：
+	方法的重写（override）两同两小一大原则：
+	方法名相同，参数类型相同
+	子类返回类型小于等于父类方法返回类型，
+	子类抛出异常小于等于父类方法抛出异常，
+	子类访问权限大于等于父类方法访问权限。
+5.java中abstract：
+	含有abstract修饰符的class即为抽象类，abstract 类不能创建的实例对象。
+	含有abstract方法的类必须定义为abstract class，abstract class类中的方法不必是抽象的。
+	abstract class类中定义抽象方法必须在具体(Concrete)子类中实现，所以，不能有抽象构造方法或抽象静态方法。
+	如果的子类没有实现抽象父类中的所有抽象方法，那么子类也必须定义为abstract类型。
+6.java中inteface：
+	变量都是 public static final 的，方法都是 public abstract的
+	java8之后，interface中可以定义 default 方法和static 方法，static 方法只能通过接口名调用，不能通过实现类名调用。default方法只能通过接口实例调用，并且可以在实现类中覆盖。
+		两个接口拥有相同的static方法没关系，可以通过接口类名区分。但是拥有两个相同的default方法就必须在实现类中覆盖这个方法，否则编译器报错。
+
+7.java的异常结构：
+				Throwable
+				/       \
+			    Exception   Error
+		    程序可处理异常      (非检查异常）
+					程序无法处理的错误
+					OutofMemoryError
+					stackoverflowError
+		    /	       \	
+	   非检查异常   	    非运行时异常
+	   RuntimeExcepion  	    检查异常
+	   NullPointerException     IOException
+ArrayIndexOutofBoundsException      EOFEception
+ArithmeticException		    FileNotFoundException
+NumberFormatException		    SQLExcpetion
+
+
+8.java线程：
+	run是线程执行的方法。
+	start是启动线程对象，使之从新建状态转入就绪状态；
+	sleep让线程睡眠一段时间，在此期间线程不消耗CPU资源；
+	suspend使线程挂起，暂停执行， 如果想恢复线程，必须由其他线程调用 resume方法。
+9.java中byte：
+	byte b1=1,b2=2,b3;
+	b3=(b1+b2)   是错误的，因为在计算时，byte会被转换为int类型进行计算，在计算完应该使用强转  正确格式：b3=(byte)(b1+b2);
+	但是当变量是final类型就不会在计算时进行类型转换。
+	例如：final byte b4=4,b5=5;  b3=b4+b5;
+10.java中线程安全类：简单记忆线程安全的集合类： 喂！SHE！  喂是指  vector，S是指 stack， H是指    hashtable，E是指：Eenumeration   还要加上properties
+
+11.java中加载器：
+	1）Bootstrap ClassLoader引导类加载器，加载java的核心库，使用原生代码实现的
+ 
+	负责加载$JAVA_HOME中jre/lib/rt.jar里所有的class，由C++实现，不是ClassLoader子类
+
+	2）system class loader 系统类加载器，根据java应用的类路径（classpath）来加载类
+ 
+	2）Extension ClassLoader扩展类加载器，加载java的扩展库
+ 
+	负责加载java平台中扩展功能的一些jar包，包括$JAVA_HOME中jre/lib/*.jar或-Djava.ext.dirs指定目录下的jar包
+ 
+	3）App ClassLoader，tomcat为每个APP创建一个loader,里面保存着此webapp的classloader。需加载webapp下的类时，就取出classloader来使用。
+ 
+	负责记载classpath中指定的jar包及目录中class
+ 
+	4）Custom ClassLoader
+ 
+	属于应用程序根据自身需要自定义的ClassLoader，如tomcat、jboss都会根据j2ee规范自行实现ClassLoader
+ 
+	加载过程中会先检查类是否被已加载，检查顺序是自底向上，从Custom ClassLoader到BootStrap ClassLoader逐层检查，
+	只要某个classloader已加载就视为已加载此类，保证此类只所有ClassLoader加载一次。而加载的顺序是自顶向下，也就是由上层来逐层尝试加载此类。
+
+12.java的参数传递：
+	class Value{
+		public int i=15;
+	}
+	public class Test{
+		public static void main(String argv[]){
+			Test t=new Test( );
+			t.first( );
+		}
+ 
+		public void first( ){
+			int i=5;
+			Value v=new Value( );
+			v.i=25;
+			second(v,i);
+			System.out.println(v.i);
+		}
+ 
+		public void second(Value v,int i){
+			i = 0;
+			v.i = 20;
+			Value val = new Value( );
+			v = val;
+			System.out.println(v.i+" "+i);
+		}
+	}
+
+	输出顺序 15 0 20
+
+13.java中多线程：
+	Java中的多线程是一种抢占式的机制，而不是分时机制。抢占式的机制是有多个线程处于可运行状态，但是只有一个线程在运行。 
+	共同点 ： 
+		1. 他们都是在多线程的环境下，都可以在程序的调用处阻塞指定的毫秒数，并返回。 
+		2. wait()和sleep()都可以通过interrupt()方法 打断线程的暂停状态 ，从而使线程立刻抛出InterruptedException。 
+		如果线程A希望立即结束线程B，则可以对线程B对应的Thread实例调用interrupt方法。如果此刻线程B正在wait/sleep/join，
+		则线程B会立刻抛出InterruptedException，在catch() {} 中直接return即可安全地结束线程。 
+		需要注意的是，InterruptedException是线程自己从内部抛出的，并不是interrupt()方法抛出的。对某一线程调用 interrupt()时，
+		如果该线程正在执行普通的代码，那么该线程根本就不会抛出InterruptedException。但是，一旦该线程进入到 wait()/sleep()/join()后，
+		就会立刻抛出InterruptedException 。 
+	不同点 ：  
+		1.每个对象都有一个锁来控制同步访问。Synchronized关键字可以和对象的锁交互，来实现线程的同步。 
+		sleep方法没有释放锁，而wait方法释放了锁，使得其他线程可以使用同步控制块或者方法。 
+		2.wait，notify和notifyAll只能在同步控制方法或者同步控制块里面使用，而sleep可以在任何地方使用 
+		3.sleep，wait,join必须捕获异常，而notify和notifyAll不需要捕获异常 
+		4.sleep是线程类（Thread）的方法，导致此线程暂停执行指定时间，给执行机会给其他线程，但是监控状态依然保持，到时后会自动恢复。调用sleep不会释放对象锁。
+		5.wait是Object类的方法，对此对象调用wait方法导致本线程放弃对象锁,只有针对此对象发出notify方法（或notifyAll）后
+		本线程才进入对象锁定池准备获得对象锁进入运行状态。
+
+14.java的字符码集：
+	java使用的是Unicode字符码，ASCII是国际使用最广泛的字符编码，BCD是一种数字压缩存储编码。Unicode中无论什么字符都是两个字节。
+
+15.java中变量的范围：
+	short -2^15  2^15-1
+	int   -2^31  2^31-1
+	long  -2^63  2^63-1
+	float  -2^31  2^31-1
+	double -2^63  2^63-1
+	boolean 默认false
+
+16.使用泛型取代非泛型的数据类型，程序的运行性能不会更好，因为java在编译阶段，虚拟机就会把泛型擦除，还原成没有泛型的代码，顶多编译时候慢点，运行时没有任何区别。
+17.java中spring：
+	Spring 框架是一个分层架构！！！由 7 个定义良好的模块组成。
+	核心容器，Spring上下文，Spring AOP， Spring DAO， Spring ORM， Spring Web， Spring MVC。这些都是spring包含的框架
+
+17.java的finalize：
+	只有当没有引用指向这个对象的时候，垃圾回收器要回收这个对象时，才会调用这个方法。
+
+18.java中的关键字
+	1，Java 关键字列表 (依字母排序 共50组)：
+		abstract, assert, boolean, break, byte, case, catch, char, class, const（保留关键字）,
+		continue, default, do, double, else, enum, extends, final, finally, float, for, goto（保留关键字）, 
+		if, implements, import, instanceof, int, interface, long, native, new, package, private, protected, public, 
+		return, short, static, strictfp, super, switch, synchronized, this, throw, throws, transient, try, void, volatile, while
+	2，保留字列表 (依字母排序 共14组)，Java保留字是指现有Java版本尚未使用，但以后版本可能会作为关键字使用：
+		byValue, cast, false, future, generic, inner, operator, outer, rest, true, var, goto （保留关键字） , const （保留关键字） , null
+
+	true和false是boolean类型的变量，是编译器赋予特殊含义的，但并不是关键字。
+
+19.截至jdk1.8，java并发框架支持的锁：
+	读写锁、自旋锁、乐观锁。
+
+20.java多线程：
+	synchronized 关键字 : 用来给对象和方法或者代码块加锁，当它锁定一个方法或者一个代码块的时候，同一时刻最多只有一个线程执行这个段代码。
+	volatile：用来确保将变量的跟新操作通知到其他线程，当把变量声明为volatile类型后，编译器与运行时都会注意到这个变量是共享的，
+		  因此不会将该变量上的操作与其他内存操作一起重排序。然而，在访问volatile变量时不会执行加锁操作，因此也就不会使执行线程阻塞，
+		  因此volatile变量是一种比 synchronized关键字更轻量级的同步机制。
+	
+21.java中join的作用：
+	等待调用join的线程执行完才执行当前线程。
+
+22.java中collection的继承结构：
+	看图
+
+23.java中字符串（重点）
+	String str1="hello";
+	String str2="he"+"llo";
+	str1==str2  //true
+	因为str1和str2都是常量，当java字符串常量池中存在hello时，str不会再生成一个新的字符串存到常量池，而是直接在常量池取"hello",所以实际上str1和str2指向同一个对象。
+	
+	String str1="hello";
+	String str2="he"+new String("llo");
+	str1==str2  //false
+	因为str1声明后，java将"hello"存在字符串常量池中，str2在声明时并不知道str2的内容是什么，所以不会放到字符串常量池中，而是放在堆中存储。
+
+24.java国际化：
+	实现国际化的常用手段是利用ResourceBundle类
+
+25.面向对象编程语言核心：
+	封装、继承、多态
+26.java中集合：
+	hashMap 允许key和value都可以为null
+	hashtable 不允许key和value为null
+	上述两个对象都继承Map
+
+27.object中含有的默认方法：
+	getClass(), hashCode(), equals(), clone(), toString(), notify(), notifyAll(),  wait(), finalize()
+
+28.java中堆的分配：
+	-Xmx：最大堆大小
+	-Xms：初始堆大小
+	-Xmn:年轻代大小
+	-XXSurvivorRatio：年轻代中Eden区与Survivor区的大小比值
+	年轻代5120m， Eden：Survivor=3，Survivor区大小=1024m（Survivor区有两个，即将年轻代分为5份，每个Survivor区占一份），总大小为2048m。
+	-Xms初始堆大小即最小内存值为10240m
+
+29.java中的编译问题:
+	J2SDK是编程工具，不是API.
+	Appletviewer.exe 就是用来解释执行java applet应用程序的,简单理解就是没有main函数的继承applet类的java类。
+	能被Appletviewer成功运行的java class文件没有main()方法
+
+30.java中多线程：
+	CyclicBarrier和count DownLatch都可以让一组线程等待其他线程。
+	Callable 中的call（）方法可以返回值和跑出异常（checkedException）
+
+31.java中的初始化顺序：
+	初始化父类中的静态成员和静态代码快，初始化子类中的静态成员和静态代码块。初始化父类中普通成员变量和代码块，再执行父类中的构造方法。初始化子类中的普通成员变量
+	和代码块，再执行子类中的构造方法。
+
+32.java中的标准statement
+	1.statement是最基本的用法，采用字符串拼接的方法，存在sql注入漏洞。
+	2.preparedstatement对statement中的sql语句进行预编译，同时检查合法性，效率高。
+	3.CallableStatement接口扩展PreparedStatement，用来调用存储过程，它提供了对输入和输出参数的支持，CallableStatement接口还具有对PreparedStatement接口提供的输入
+	  输出的参数支持。
+
+33.java中static变量
+	java中 static的int 默认初始值为0；
+
+34.java中Collection的线程安全：
+	HashMap和TreeMap都未考虑线程安全。
+	HashTable 和 ConcurrentHashMap都是线程安全的，只是加锁的范围不同，HashTable将整个哈希表进行加锁，而ConcurrentHashMap将哈希表分为16桶，每次对需要的桶进行加锁。
+
+35.java中的重载：
+	1.在同一个类中。
+	2.方法名相同。
+	3.方法的形参不同，具体表现为：类型、个数、顺序不同才可以重载。
+	4.比较容易忽略的点：与方法的返回类型和访问权限无关。
+
+36.java中的基本类型：
+	long a=012；true   因为是基本类型所以编译器会自动进行转型。
+	float b=-412； true  同上，      但是float b=-412.2； false  因为java中默认的浮点型为double，所以会报错。
+
+37.java中多线程：
+	一定要注意线程调用的是什么方法，如果调用的是start方法则开启一条新线程，但是如果调用的是run方法就只是普通的调用函数，会顺序执行，不会开启新线程。
+
+38.java中的静态方法：
+	java的NullPointerException是引用堆内存的对象为空时，才是空指针异常。
+	静态方法不依赖对象，所以即使对象为null也可以调用静态方法。   例如： Test t=null；t.hello();  （hello为Test类中公有静态方法）
+
+39.Hibernate优化所鼓励的7大措施：
+	1.尽量使用many-to-one，避免使用单项one-to-many
+	2.灵活使用单向one-to-many
+	3.不用一对一，使用多对一代替一对一
+	4.配置对象缓存，不使用集合缓存
+	5.一对多使用Bag 多对一使用Set
+	6.继承使用显示多态 HQL:from object polymorphism="exlicit" 避免查处所有对象
+	7.消除大表，使用二级缓存
+
+40.servlet体系结构，看图。
+
+41.java中抽象类和接口的区别：
+	1. 一个子类只能继承一个抽象类,但能实现多个接口
+	2. 抽象类可以有构造方法,接口没有构造方法
+	3. 抽象类可以有普通成员变量,接口没有普通成员变量
+	4. 抽象类和接口都可有静态成员变量,抽象类中静态成员变量访问类型任意,接口只能public static final(默认)
+	5. 抽象类可以没有抽象方法,抽象类可以有普通方法,接口中都是抽象方法
+	6. 抽象类可以有静态方法,接口不能有静态方法
+	7. 抽象类中的方法可以是public、protected;接口方法只有public。
+	8. 抽象类中方法默认的访问权限是default，接口是public。
+
+42.javaweb中会话跟踪技术：
+	会话跟踪是一种灵活、轻便的机制，它使Web上的状态编程变为可能。
+	HTTP是一种无状态协议，每当用户发出请求时，服务器就会做出响应，客户端与服务器之间的联系是离散的、非连续的。
+	当用户在同一网站的多个页面之间转换时，根本无法确定是否是同一个客户，会话跟踪技术就可以解决这个问题。
+	当一个客户在多个页面间切换时，服务器会保存该用户的信息。
+
+	有四种方法可以实现会话跟踪技术：URL重写、隐藏表单域、Cookie、Session。
+		1）.隐藏表单域：<input type="hidden">，非常适合步需要大量数据存储的会话应用。
+		2）.URL 重写:URL 可以在后面附加参数，和服务器的请求一起发送，这些参数为名字/值对。
+		3）.Cookie:一个 Cookie 是一个小的，已命名数据元素。服务器使用 SET-Cookie 头标将它作为 HTTP
+		    响应的一部分传送到客户端，客户端被请求保存 Cookie 值，在对同一服务器的后续请求使用一个
+		    Cookie 头标将之返回到服务器。与其它技术比较，Cookie 的一个优点是在浏览器会话结束后，甚至
+		    在客户端计算机重启后它仍可以保留其值
+		4）.Session：使用 setAttribute(String str,Object obj)方法将对象捆绑到一个会话
+
+43.servlet是不是线程安全的？
+	servlet在多线程下其本身并不是线程安全的。
+	如果在类中定义成员变量，而在service中根据不同的线程对该成员变量进行更改，那么在并发的时候就会引起错误。
+	最好是在方法中，定义局部变量，而不是类变量或者对象的成员变量。
+	由于方法中的局部变量是在栈中，彼此各自都拥有独立的运行空间而不会互相干扰，因此才做到线程安全。
+
+44.java中的堆栈分别储存什么：
+	栈：线程私有的，存放局部基本类型的变量（java中定义的八种基本类型：boolean、char、byte、short、int、long、float、double）、部分的返回结果以及Stack Frame，
+	    非基本类型的对象在JVM栈上仅存放一个指向堆上的地址。
+	堆：用来存储对象实例以及数组值的区域，可以认为Java中所有通过new创建的对象的内存都在此分配
+	方法区：方法区域存放了所加载的类的信息（名称、修饰符等）、类中的静态变量、类中定义为final类型的常量、类中的Field信息、类中的方法信息，
+		当开发人员在程序中通过Class对象中的getName、isInterface等方法来获取信息时，这些数据都来源于方法区域，同时方法区域也是全局共享的，在一定的条件下它也会被GC，
+		当方法区域需要使用的内存超过其允许的大小时，会抛出OutOfMemory的错误信息。
+	常量池：存放的为类中的固定的常量信息、方法和Field的引用信息等，其空间从方法区域中分配。
+	http://www.cnblogs.com/liulipeng/archive/2013/09/13/3319675.html
+
+45.java中finally的执行时间：
+	不管try中有没有catch到异常，finally都会执行
+	当try中有return时，跳转到finally中执行全部代码后结束。
+	当catch中有return时，同上。
+	当try或catch中有System.exit(0)直接结束程序
+
+45.java中局部变量一定要初始化，否则编译出错。
+
+46.java中 int 和Integer 的比较问题：
+	两个int只是常量的普通比较，比较两个int的值。
+	int a=0;Integer b=new Integer(0);  a==b  //true  因为常量池中有0了，所以Integer b直接从常量池中取值，并没有新建对象，所以是true。
+	但是非常重要的一点：两个Integer比较：  
+		Integer a=new Integer(1); Integer b=new Integer(1);  a==b  //true  因为在范围 -128到127内，常量池有值，从常量池中取。内存地址相同。
+		Integer a=new Integer(300);Integer b=new Integer(300); a==b  //false  因为范围超出 -128到127 ，所以新建对象。内存地址不同。
+	
+47.java中多线程：
+	CopyOnWriteArrayList适用于写少读多的并发场景
+	ReadWriteLock即为读写锁，他要求写与写之间互斥，读与写之间互斥，读与读之间可以并发执行。在读多写少的情况下可以提高效率
+	ConcurrentHashMap是同步的HashMap，读写都加锁
+	volatile只保证多线程操作的可见性，不保证原子性
+
+48.getClass().getName()方法
+	如果没有重写Object的getClass()方法，就会返回当前类的类名。（getName返回 包名.类名的格式）
+
+49.java中管道(Pipe)：
+	管道实际上是一种固定大小的缓冲区，管道对于管道两端的进程而言，就是一个文件，但它不是普通的文件，它不属于某种文件系统，而是自立门户，单独构成一种文件系统，
+	并且只存在于内存中。它类似于通信中半双工信道的进程通信机制，一个管道可以实现双向 的数据传输，
+	而同一个时刻只能最多有一个方向的传输，不能两个方向同时进行。管道的容 量大小通常为内存上的一页，它的大小并不是受磁盘容量大小的限制。
+	当管道满时，进程在 写管道会被阻塞，而当管道空时，进程读管道会被阻塞,
+	可以有多个线程操作管道，但不能同时进行读写操作。
+
+50.java中的构造函数：
+	类中普通方法可以和类名相同，和构造函数的区别就是有返回值。
+
+51.java中的ceil和floor
+	ceil：大于等于 x，并且与它最接近的整数。当  x>-1 and x<0  Math.ceil(x)=-0.0;
+	floor：小于等于 x，且与 x 最接近的整数。
+52.java的volatile：
+	所谓 volatile的措施，就是
+	1. 每次从内存中取值，不从缓存中什么的拿值。这就保证了用 volatile修饰的共享变量，每次的更新对于其他线程都是可见的。
+	2. volatile保证了其他线程的立即可见性，就没有保证原子性。
+	3.由于有些时候对 volatile的操作，不会被保存，说明不会造成阻塞。不可用与多线程环境下的计数器。
+
+53.java虚拟机的详细：
+	https://www.nowcoder.com/test/question/done?tid=12727582&qid=14817#summary
+	链接：https://www.nowcoder.com/questionTerminal/2a1cdf3e61d14947bf00dfe10e25a2c0
+	来源：牛客网
+
+	http://www.cnblogs.com/sunada2005/p/3577799.html java虚拟机详解。
+
+	大多数 JVM 将内存区域划分为 Method Area（Non-Heap）（方法区） ,Heap（堆） , Program Counter Register（程序计数器） ,   VM Stack（虚拟机栈，也有翻译成JAVA 方法栈的）,
+	Native Method Stack  （ 本地方法栈 ），其中Method Area 和  Heap 是线程共享的  ，VM Stack，Native Method Stack  和Program Counter Register  是非线程共享的。
+	
+	为什么分为 线程共享和非线程共享的呢?请继续往下看。
+	首先我们熟悉一下一个一般性的 Java 程序的工作过程。一个 Java 源程序文件，会被编译为字节码文件（以 class 为扩展名），每个java程序都需要运行在自己的JVM上
+	，然后告知 JVM 程序的运行入口，再被 JVM 通过字节码解释器加载运行。那么程序开始运行后，都是如何涉及到各内存区域的呢？
+
+	概括地说来，JVM初始运行的时候都会分配好 Method Area（方法区） 和Heap（堆） ，而JVM 每遇到一个线程，就为其分配一个 Program Counter Register（程序计数器） , 
+	  VM Stack（虚拟机栈）和Native Method Stack  （本地方法栈）， 当线程终止时，三者（虚拟机栈，本地方法栈和程序计数器）所占用的内存空间也会被释放掉。
+	这也是为什么我把内存区域分为线程共享和非线程共享的原因，非线程共享的那三个区域的生命周期与所属线程相同，而线程共享的区域与JAVA程序运行的生命周期相同，
+	所以这也是系统垃圾回收的场所只发生在线程共享的区域（实际上对大部分虚拟机来说知发生在Heap上）的原因。
+
+
+54.java中的多态
+package Wangyi;
+class Base
+{
+    public void method()
+    {
+        System.out.println("Base");
+    } 
+}
+class Son extends Base
+{
+    public void method()
+    {
+        System.out.println("Son");
+    }
+     
+    public void methodB()
+    {
+        System.out.println("SonB");
+    }
+}
+public class Test01
+{
+    public static void main(String[] args)
+    {
+        Base base = new Son();
+        base.method();
+        base.methodB();
+    }
+}
+
+编译出错，  原因：
+	多态：父类型的引用可以指向子类型的对象。
+	与函数重载不同
+	在方法调用的时候发现，父类里没有的函数，在多态实现的时候不能出现。
+	父类里如果有调用的是子类的同名方法。
+
+55.java中多线程：
+ConcurrentHashMap使用segment来分段和管理锁，segment继承自ReentrantLock，因此ConcurrentHashMap使用ReentrantLock来保证线程安全。将哈希表分16桶，对需要的桶进行加锁。
+
+
+56.JDK1.7以后
+	Arrays.asList()将一个数组转化为一个List对象，这个方法会返回一个ArrayList类型的对象， 
+	这个ArrayList类并非java.util.ArrayList类，而是Arrays类的静态内部类（java.util.Arrays.ArrayList）！用这个对象对列表进行添加删除更新操作，就会报UnsupportedOperationException异常。
+
+57.java中的继承：
+	java中的子类可以继承父类的所有数据域和方法，但是父类中私有的变量和方法子类无法访问。
+58.java的序列化（serializable）：
+	transient关键字修饰的变量不会在序列化时进行序列化。
+
+59.webservice：
+	Webservice是跨平台，跨语言的远程调用技术;
+	它的通信机制实质就是xml数据交换;
+	它采用了soap协议（简单对象协议）进行通信；
+
+60.javaweb：
+	getParameter()是获取POST/GET传递的参数值；
+	getInitParameter获取Tomcat的server.xml中设置Context的初始化参数
+	getAttribute()是获取对象容器中的数据值；
+	getRequestDispatcher是请求转发。
+
+61.servlet生命周期：
+	Servlet的生命周期分为5个阶段：加载、创建、初始化、处理客户请求、卸载。
+	(1)加载：容器通过类加载器使用servlet类对应的文件加载servlet
+	(2)创建：通过调用servlet构造函数创建一个servlet对象
+	(3)初始化：调用init方法初始化
+	(4)处理客户请求：每当有一个客户请求，容器会创建一个线程来处理客户请求
+	(5)卸载：调用destroy方法让servlet自己释放其占用的资源
+
+62.java正则表达式
+	"com.jd.".replaceAll(".","/")+"myclass.class";
+	结果为："///////myclass.class"  因为在正则中.代表任何字符,只替换.应该写成    replaceAll("\\.","/")
+
+63.SpringMVC的原理：
+	SpringMVC是Spring中的模块，它实现了mvc设计模式的web框架，首先用户发出请求，请求到达SpringMVC的前端控制器（DispatcherServlet）,
+	前端控制器根据用户的url请求处理器映射器查找匹配该url的handler，并返回一个执行链，
+	前端控制器再请求处理器适配器调用相应的handler进行处理并返回给前端控制器一个modelAndView，
+	前端控制器再请求视图解析器对返回的逻辑视图进行解析，最后前端控制器将返回的视图进行渲染并把数据装入到request域，返回给用户。
+	DispatcherServlet作为springMVC的前端控制器，负责接收用户的请求并根据用户的请求返回相应的视图给用户。
+	实现业务操作时在service层.
+
+64.java的命令行工具
+	javac.exe是编译.java文件
+	java.exe是执行编译好的.class文件
+	javadoc.exe是生成Java说明文档
+	jdb.exe是Java调试器
+	javaprof.exe是剖析工具
+
+65.Spring中的事务：
+	事务属性的种类：   传播行为、隔离级别、只读和事务超时
+  
+	a)    传播行为定义了被调用方法的事务边界。
+ 
+	传播行为
+	意义
+	PROPERGATION_MANDATORY
+	表示方法必须运行在一个事务中，如果当前事务不存在，就抛出异常
+	PROPAGATION_NESTED
+	表示如果当前事务存在，则方法应该运行在一个嵌套事务中。否则，它看起来和 PROPAGATION_REQUIRED 看起来没什么俩样
+	PROPAGATION_NEVER
+	表示方法不能运行在一个事务中，否则抛出异常
+	PROPAGATION_NOT_SUPPORTED
+	表示方法不能运行在一个事务中，如果当前存在一个事务，则该方法将被挂起
+	PROPAGATION_REQUIRED
+	表示当前方法必须运行在一个事务中，如果当前存在一个事务，那么该方法运行在这个事务中，否则，将创建一个新的事务
+	PROPAGATION_REQUIRES_NEW
+	表示当前方法必须运行在自己的事务中，如果当前存在一个事务，那么这个事务将在该方法运行期间被挂起
+	PROPAGATION_SUPPORTS
+	表示当前方法不需要运行在一个是事务中，但如果有一个事务已经存在，该方法也可以运行在这个事务中
+		 
+ 
+	b)    隔离级别
+	在操作数据时可能带来 3 个副作用，分别是脏读、不可重复读、幻读。为了避免这 3 中副作用的发生，在标准的 SQL 语句中定义了 4 种隔离级别，分别是未提交读、已提交读、可重复读、可序列化。而在 spring 事务中提供了 5 种隔离级别来对应在 SQL 中定义的 4 种隔离级别，如下：
+	隔离级别
+	意义
+	ISOLATION_DEFAULT
+	使用后端数据库默认的隔离级别
+	ISOLATION_READ_UNCOMMITTED
+	允许读取未提交的数据（对应未提交读），可能导致脏读、不可重复读、幻读
+	ISOLATION_READ_COMMITTED
+	允许在一个事务中读取另一个已经提交的事务中的数据（对应已提交读）。可以避免脏读，但是无法避免不可重复读和幻读
+	ISOLATION_REPEATABLE_READ
+	一个事务不可能更新由另一个事务修改但尚未提交（回滚）的数据（对应可重复读）。可以避免脏读和不可重复读，但无法避免幻读
+	ISOLATION_SERIALIZABLE
+	这种隔离级别是所有的事务都在一个执行队列中，依次顺序执行，而不是并行（对应可序列化）。可以避免脏读、不可重复读、幻读。但是这种隔离级别效率很低，因此，除非必须，否则不建议使用。
+ 
+ 
+	c)    只读
+	如果在一个事务中所有关于数据库的操作都是只读的，也就是说，这些操作只读取数据库中的数据，而并不更新数据，那么应将事务设为只读模式（ READ_ONLY_MARKER ） , 这样更有利于数据库进行优化 。
+	因为只读的优化措施是事务启动后由数据库实施的，因此，只有将那些具有可能启动新事务的传播行为 (PROPAGATION_NESTED 、 PROPAGATION_REQUIRED 、 PROPAGATION_REQUIRED_NEW) 的方法的事务标记成只读才有意义。
+	如果使用 Hibernate 作为持久化机制，那么将事务标记为只读后，会将 Hibernate 的 flush 模式设置为 FULSH_NEVER, 以告诉 Hibernate 避免和数据库之间进行不必要的同步，并将所有更新延迟到事务结束。
+	d)   事务超时
+	如果一个事务长时间运行，这时为了尽量避免浪费系统资源，应为这个事务设置一个有效时间，使其等待数秒后自动回滚。与设
+	置“只读”属性一样，事务有效属性也需要给那些具有可能启动新事物的传播行为的方法的事务标记成只读才有意义。
+
+
+66.java中的枚举（底层实现）
+	枚举类在后台实现时，实际上是转化为一个继承了java.lang.Enum类的实体类，原先的枚举类型变成对应的实体类型，上例中AccountType变成了个class AccountType，并且会生成一个新的构造函数，若原来有构造函数，则在此基础上添加两个参数，生成新的构造函数，如上例子中：
+	private AccountType(){ System.out.println(“It is a account type”); }
+	会变成：
+	private AccountType(String s, int i){
+	   super(s,i); System.out.println(“It is a account type”); }
+	而在这个类中，会添加若干字段来代表具体的枚举类型：
+	public static final AccountType SAVING;
+	public static final AccountType FIXED;
+	public static final AccountType CURRENT;
+
+	而且还会添加一段static代码段：
+	static{
+	SAVING = new AccountType("SAVING", 0);
+	 ...  CURRENT = new AccountType("CURRENT", 0);
+	$VALUES = new AccountType[]{
+		 SAVING, FIXED, CURRENT
+	    } }
+	以此来初始化枚举中的每个具体类型。（并将所有具体类型放到一个$VALUE数组中，以便用序号访问具体类型）
+	在初始化过程中new AccountType构造函数被调用了三次，所以Enum中定义的构造函数中的打印代码被执行了3遍。
+
+67.Math.round()方法：
+	底层实现为Math.floor(x+0.5);所以要记住，如果是负数的话，就不是简单的四舍五入。
+
+
+68.java的垃圾回收：
+	这是一个关于java的垃圾回收机制的题目。垃圾回收主要针对的是堆区的回收，因为栈区的内存是随着线程而释放的。堆区分为三个区：年轻代（Young Generation）、年老代（Old Generation）、
+	永久代（Permanent Generation，也就是方法区）。
+
+	年轻代：对象被创建时（new）的对象通常被放在Young（除了一些占据内存比较大的对象）,经过一定的Minor GC（针对年轻代的内存回收）还活着的对象会被移动到年老代（一些具体的移动细节省略）。
+	年老代：就是上述年轻代移动过来的和一些比较大的对象。Minor GC(FullGC)是针对年老代的回收，这个很关键
+	永久代：存储的是final常量，static变量，常量池。
+
+
+	1，新生代：（1）所有对象创建在新生代的Eden区，当Eden区满后触发新生代的Minor GC，将Eden区和非空闲Survivor区存活的对象复制到另外一个空闲的Survivor区中。
+		   （2）保证一个Survivor区是空的，新生代Minor GC就是在两个Survivor区之间相互复制存活对象，直到Survivor区满为止。
+	2，老年代：当Survivor区也满了之后就通过Minor GC将对象复制到老年代。老年代也满了的话，就将触发Full GC，针对整个堆（包括新生代、老年代、持久代）进行垃圾回收。
+	3，持久代：持久代如果满了，将触发Full GC。
+
+69.jsp内置对象：
+	一共有9个内置对象
+	pageContext javax.servlet.jsp.PageContext
+	request javax.servlet.http.HttpServletRequest 
+	response javax.servlet.http.HttpServletResponse 
+	session javax.servlet.http.HttpSession 
+	application javax.servlet.ServletContext 
+	config javax.serlvet.ServletConfig 
+	exception java.lang.Throwable
+	page java.lang.Object 
+	out javax.servlet.jsp.JspWriter 
+	作用： 
+	1、pageContext 表示页容器 EL表达式、 标签 、上传 
+	2、request 服务器端取得客户端的信息：头信息 、Cookie 、请求参数 ，最大用处在MVC设计模式上 
+	3、response 服务器端回应客户端信息：Cookie、重定向 
+	4、session 表示每一个用户，用于登录验证上 
+	5、application 表示整个服务器 
+	6、config 取得初始化参数，初始化参数在web.xml文件中配置 
+	7、exception 表示的是错误页的处理操作 
+	8、page 如同this一样，代表整个jsp页面自身 
+	9、out 输出 ，但是尽量使用表达式输出
+
+
+70.java程序的种类：
+	（a）内嵌于Web文件中，由浏览器来观看的_Applet
+	（b）可独立运行的 Application
+	（c）服务器端的 Servlets
+
+71.java的语言种类：
+	编译型语言：首先将源代码编译生成机器语言，再由机器运行机器码（二进制）。像C/C++等都是编译型语言。程序执行效率高，依赖编译器，跨平台性差些。如C、C++、Delphi等
+	解释性语言：在运行程序的时候才翻译，比如解释性basic语言，专门有一个解释器能够直接执行basic程序，每个语句都是执行的时候才翻译。
+		    这样解释性语言每执行一次就要翻译一次，效率比较低。如JavaScript、VBScript、Perl、Python、Ruby、MATLAB 等等
+
+	Java不同于一般的编译语言和直译语言。它首先将源代码编译成字节码，然后依赖各种不同平台上的虚拟机来解释执行字节码，从而实现了“一次编写，到处运行”的跨平台特性，
+	所以说java是一种解释型的语言。
+
+72.java中前台线程就是我们自己开启的线程和主线程，后台线程是守护线程。前台线程都结束了是java判断程序是否结束的标准。
+
+73.java中线程局部储存（TLS）thread local storage
+	1.解决多线程中的对同一变量的访问冲突的一种技术
+	2.TLS会为每一个线程维护一个和该线程绑定的变量的副本
+	3.Java平台的java.lang.ThreadLocal是TLS技术的一种实现
+
+74.java的concurrent包
+	1.Future表示获取一个正在指定的线程的结果。对该线程有取消和判断是否执行完毕等操作。
+	2.CountDownLatch 是个锁存器，他表示我要占用给定的多少个线程且我优先执行，我执行完之前其他要使用该资源的都要等待。
+	3.Semaphore，就像是一个许可证发放者，也想一个数据库连接池。证就这么多，如果池中的证没换回来，其他人就不能用。
+	4.ReentrantLock 和 synchronized一样，用于锁定线程。
+
+75.java中文件读取：
+	A.文件分为文本文件和二进制文件，计算机只认识二进制，所以实际上都是二进制的不同解释方式。文本文件是以不同编码格式显示的字符，
+	  例如Ascii、Unicode等，window中文本文件的后缀名有".txt",".log",各种编程语言的源码文件等；二进制文件就是用文本文档打开是看不懂乱码，
+	  只要能用文本打开的文件都可以算是文本文件，只是显示的结果不是你想要的，二进制文件只有用特殊的应用才能读懂的文件，例如".png",".bmp"等，
+	  计算机中大部分的文件还是二进制文件。
+
+	B.File类是对文件整体或者文件属性操作的类，例如创建文件、删除文件、查看文件是否存在等功能，不能操作文件内容；文件内容是用IO流操作的。
+	C.当输入过程中意外到达文件或流的末尾时，抛出EOFException异常,正常情况下读取到文件末尾时，返回一个特殊值表示文件读取完成，例如read()返回-1表示文件读取完成。
+	D.不论是文本文件还是二进制文件，在计算机中都是以二进制形式存储的，所以都当做二进制文件读取。
+
+
+76.java类加载过程：
+	类从被加载到虚拟机内存中开始，到卸载出内存为止，它的整个生命周期包括：加载（Loading）、验证（Verification）、准备(Preparation)、解析(Resolution)、
+	初始化(Initialization)、使用(Using)和卸载(Unloading)7个阶段。其中准备、验证、解析3个部分统称为连接（Linking）。如图所示。
+	
+	http://www.importnew.com/18548.html
+
+	加载、验证、准备、初始化和卸载这5个阶段的顺序是确定的，类的加载过程必须按照这种顺序按部就班地开始，而解析阶段则不一定：
+		它在某些情况下可以在初始化阶段之后再开始，这是为了支持Java语言的运行时绑定（也称为动态绑定或晚期绑定）。以下陈述的内容都已HotSpot为基准。
+
+	1.加载
+		在加载阶段（可以参考java.lang.ClassLoader的loadClass()方法），虚拟机需要完成以下3件事情：
+		1.通过一个类的全限定名来获取定义此类的二进制字节流（并没有指明要从一个Class文件中获取，可以从其他渠道，譬如：网络、动态生成、数据库等）；
+		2.将这个字节流所代表的静态存储结构转化为方法区的运行时数据结构；
+		3，在内存中生成一个代表这个类的java.lang.Class对象，作为方法区这个类的各种数据的访问入口；
+
+		加载阶段和连接阶段（Linking）的部分内容（如一部分字节码文件格式验证动作）是交叉进行的，加载阶段尚未完成，连接阶段可能已经开始，
+		但这些夹在加载阶段之中进行的动作，仍然属于连接阶段的内容，这两个阶段的开始时间仍然保持着固定的先后顺序。
+	2.验证
+		验证是连接阶段的第一步，这一阶段的目的是为了确保Class文件的字节流中包含的信息符合当前虚拟机的要求，并且不会危害虚拟机自身的安全。
+		验证阶段大致会完成4个阶段的检验动作：
+
+		1.文件格式验证：验证字节流是否符合Class文件格式的规范；例如：是否以魔术0xCAFEBABE开头、主次版本号是否在当前虚拟机的处理范围之内、
+			      常量池中的常量是否有不被支持的类型。
+		2.元数据验证：对字节码描述的信息进行语义分析（注意：对比javac编译阶段的语义分析），以保证其描述的信息符合Java语言规范的要求；
+			    例如：这个类是否有父类，除了java.lang.Object之外。
+		3.字节码验证：通过数据流和控制流分析，确定程序语义是合法的、符合逻辑的。
+		4.符号引用验证：确保解析动作能正确执行。
+
+		验证阶段是非常重要的，但不是必须的，它对程序运行期没有影响，如果所引用的类经过反复验证，那么可以考虑采用-Xverifynone参数来关闭大部分的类验证措施，
+		以缩短虚拟机类加载的时间。
+	3.准备
+		准备阶段是正式为类变量分配内存并设置类变量初始值的阶段，这些变量所使用的内存都将在方法区中进行分配。
+		这时候进行内存分配的仅包括类变量（被static修饰的变量），而不包括实例变量，实例变量将会在对象实例化时随着对象一起分配在堆中。
+		其次，这里所说的初始值“通常情况”下是数据类型的零值，假设一个类变量的定义为：
+                publicstaticintvalue=123;        
+
+		那变量value在准备阶段过后的初始值为0而不是123.因为这时候尚未开始执行任何java方法，而把value赋值为123的putstatic指令是程序被编译后，
+		存放于类构造器()方法之中，所以把value赋值为123的动作将在初始化阶段才会执行。
+
+		至于“特殊情况”是指：public static final int value=123，即当类字段的字段属性是ConstantValue时，会在准备阶段初始化为指定的值，
+		所以标注为final之后，value的值在准备阶段初始化为123而非0.
+	4.解析
+		解析阶段是虚拟机将常量池内的符号引用替换为直接引用的过程。
+		解析动作主要针对类或接口、字段、类方法、接口方法、方法类型、方法句柄和调用点限定符7类符号引用进行。
+	5.初始化
+		类初始化阶段是类加载过程的最后一步，到了初始化阶段，才真正开始执行类中定义的java程序代码。在准备极端，变量已经付过一次系统要求的初始值，而在初始化阶段，
+		则根据程序猿通过程序制定的主管计划去初始化类变量和其他资源，或者说：初始化阶段是执行类构造器<clinit>()方法的过程.
+
+		<clinit>()方法是由编译器自动收集类中的所有类变量的赋值动作和静态语句块static{}中的语句合并产生的，编译器收集的顺序是由语句在源文件中出现的顺序所决定的
+		，静态语句块只能访问到定义在静态语句块之前的变量，定义在它之后的变量，在前面的静态语句块可以赋值，但是不能访问
+
+
+77.面向对象五大原则：
+	1.单一职责原则（SRP）
+	2.开放封闭原则（OCP）
+	3.里氏替换原则（LSP）
+	4.依赖倒置原则（DIP）
+	5.接口隔离原则（ISP）
+
+78.java实现了真数组：
+	真数组： 数组元素在内存中是一个接着一个线性存放的，通过第一个元素就能访问随后的元素，避免了数据覆盖的可能性。
+
+79.java中ArrayList初始大小为10，但是ArrayList提供了构造指定大小容量的构造方法。在添加元素的时候如果超过初始大小每次扩充至当前容量的1.5倍。
+   java中HashMap初始大小为16，每次扩容直接翻倍
+   java中HashTable初始大小为11，每次扩容2*old+1
+
+80.java中内部类的声明创建的方式：
+	public class Enclosingone {
+		//非静态内部类
+		public class InsideOne {}
+		//静态内部类
+		public static class InsideTwo{}
+	}
+ 
+	class Mytest02{
+		public static void main(String args []){
+			Enclosingone.InsideOne obj1 = new Enclosingone().new InsideOne();//非静态内部类对象
+			Enclosingone.InsideTwo obj2 = new Enclosingone.InsideTwo();//静态内部类对象
+		}
+	}
+
+81.java内部类访问外部类数据的问题：
+	静态内部类可以访问外围类的静态数据，包括私有数据，但不能访问非静态数据；
+	非静态内部类可以直接访问外围类的数据，包括私有数据
+
+82.java的垃圾回收机制：
+	两个最基本的java回收算法：复制算法和标记清理算法
+	复制算法：两个区域A和B，初始对象在A，继续存活的对象被转移到B。此为新生代最常用的算法
+	标记清理：一块区域，标记要回收的对象，然后回收，一定会出现碎片，那么引出
+	标记-整理算法：多了碎片整理，整理出更大的内存放更大的对象
+	两个概念：新生代和年老代
+	新生代：初始对象，生命周期短的
+	永久代：长时间存在的对象
+	整个java的垃圾回收是新生代和年老代的协作，这种叫做分代回收。
+	
+	P.S：
+	Serial New收集器是针对新生代的收集器，采用的是复制算法
+	Parallel New（并行）收集器，新生代采用复制算法，老年代采用标记整理
+	Parallel Scavenge（并行）收集器，针对新生代，采用复制收集算法
+	Serial Old（串行）收集器，新生代采用复制，老年代采用标记整理
+	Parallel Old（并行）收集器，针对老年代，标记整理
+	CMS收集器，基于标记清理
+	G1收集器：整体上是基于标记 整理 ，局部采用复制
+
+	综上：新生代基本采用复制算法，老年代采用标记整理算法。cms采用标记清理。
+
+83.java中Set和HashMap确保键唯一性的方法：
+	查找书  Effective Java
+
+84.java中HashTable和HashMap的区别：
+	1继承不同。
+		public class Hashtable extends Dictionary implements Map 
+		public class HashMap extends AbstractMap implements Map
+	2
+		Hashtable 中的方法是同步的，而HashMap中的方法在缺省情况下是非同步的。在多线程并发的环境下，可以直接使用Hashtable，
+		但是要使用HashMap的话就要自己增加同步处理了。
+	3
+		Hashtable中，key和value都不允许出现null值。
+		在HashMap中，null可以作为键，这样的键只有一个；可以有一个或多个键所对应的值为null。
+		当get()方法返回null值时，即可以表示 HashMap中没有该键，也可以表示该键所对应的值为null。
+		因此，在HashMap中不能由get()方法来判断HashMap中是否存在某个键， 而应该用containsKey()方法来判断。
+	4两个遍历方式的内部实现上不同。
+		Hashtable、HashMap都使用了 Iterator。而由于历史原因，Hashtable还使用了Enumeration的方式 。
+	5
+		哈希值的使用不同，HashTable直接使用对象的hashCode。而HashMap重新计算hash值。
+	6
+		Hashtable和HashMap它们两个内部实现方式的数组的初始大小和扩容的方式。HashTable中hash数组默认大小是11，增加的方式是 old*2+1。
+		HashMap中hash数组的默认大小是16，而且一定是2的指数。 
+
+	7
+		HashMap只有containsKey和containsValue方法，没有contains方法。而HashTable三个方法都包含。
+
+85.java中switch支持什么类型
+	switch语句后的控制表达式只能是short、char、int、long整数类型和枚举类型，不能是float，double和boolean类型。String类型是java7开始支持。 
+
+86.java8中Queue
+	1、LinkedBlockingQueue：基于链接节点的可选限定的blocking queue 。 这个队列排列元素FIFO（先进先出）。 队列的头部是队列中最长的元素。 队列的尾部是队列中最短时间的元素。 新元素插入队列的尾部，队列检索操作获取队列头部的元素。 链接队列通常具有比基于阵列的队列更高的吞吐量，但在大多数并发应用程序中的可预测性能较低。
+	blocking queue说明：不接受null元素；可能是容量有限的；实现被设计为主要用于生产者 - 消费者队列；不支持任何类型的“关闭”或“关闭”操作，表示不再添加项目实现是线程安全的；
+	
+
+	2、PriorityQueue：
+	2.1、基于优先级堆的无限优先级queue 。 优先级队列的元素根据它们的有序natural ordering ，或由一个Comparator在队列构造的时候提供，这取决于所使用的构造方法。 优先队列不允许null元素。 依靠自然排序的优先级队列也不允许插入不可比较的对象（这样做可能导致ClassCastException ）。
+	2.2、该队列的头部是相对于指定顺序的最小元素。 如果多个元素被绑定到最小值，那么头就是这些元素之一 - 关系被任意破坏。 队列检索操作poll ， remove ， peek和element访问在队列的头部的元件。
+	2.3、优先级队列是无限制的，但是具有管理用于在队列上存储元素的数组的大小的内部容量 。 它始终至少与队列大小一样大。 当元素被添加到优先级队列中时，其容量会自动增长。 没有规定增长政策的细节。
+	2.4、该类及其迭代器实现Collection和Iterator接口的所有可选方法。 方法iterator()中提供的迭代器不能保证以任何特定顺序遍历优先级队列的元素。 如果需要有序遍历，请考虑使用Arrays.sort(pq.toArray()) 。
+	2.5、请注意，此实现不同步。 如果任何线程修改队列，多线程不应同时访问PriorityQueue实例。 而是使用线程安全的PriorityBlockingQueue类。
+	实现注意事项：此实现提供了O（日志（n））的时间入队和出队方法（ offer ， poll ， remove()和add ）; remove(Object)和contains(Object)方法的线性时间; 和恒定时间检索方法（ peek ， element和size ）。
+
+
+	3、ConcurrentLinkedQueue：基于链接节点的无界并发deque(deque是双端队列) 。 并发插入，删除和访问操作可以跨多个线程安全执行。 A ConcurrentLinkedDeque是许多线程将共享对公共集合的访问的适当选择。像大多数其他并发集合实现一样，此类不允许使用null元素。
+	
+87.java反射机制中：
+	public Method[] getDeclaredMethods()
+		返回类或接口声明的所有方法，包括public, protected, default (package) 访问和private方法的Method对象，但不包括继承的方法。当然也包括它所实现接口的方法。
+	public Method[] getMethods()
+		返回类的所有public方法，包括其继承类的公用方法，当然也包括它所实现接口的方法。
+
+88.java中双亲委托模型：
+	JVM加载类的实现方式，我们称为 双亲委托模型：
+
+	如果一个类加载器收到了类加载的请求，他首先不会自己去尝试加载这个类，而是把这个请求委托给自己的父加载器，每一层的类加载器都是如此，因此所有的类加载请求最终都应该传送到顶层的Bootstrap ClassLoader中，只有当父加载器反馈自己无法完成加载请求时，子加载器才会尝试自己加载。
+	双亲委托模型的重要用途是为了解决类载入过程中的安全性问题。
+
+	假设有一个开发者自己编写了一个名为Java.lang.Object的类，想借此欺骗JVM。现在他要使用自定义ClassLoader来加载自己编写的java.lang.Object类。然而幸运的是，双亲委托模型不会让他成功。因为JVM会优先在Bootstrap ClassLoader的路径下找到java.lang.Object类，并载入它
+
+
+89.java中ThreadLocal：
+	1.ThreadLocal存放的值是线程封闭，线程间互斥的，主要用于线程内共享一些数据，避免通过参数来传递
+
+	2.线程的角度看，每个线程都保持一个对其线程局部变量副本的隐式引用，只要线程是活动的并且 ThreadLocal 实例是可访问的；
+	在线程消失之后，其线程局部实例的所有副本都会被垃圾回收
+
+	3.在Thread类中有一个Map，用于存储每一个线程的变量的副本。
+	4.对于多线程资源共享的问题，同步机制采用了“以时间换空间”的方式，而ThreadLocal采用了“以空间换时间”的方式
+
+90.java中String、StringBuffer、StringBuilder
+	StringBuffer是线程安全的。
+
+	StringBuilder不是线程安全的，需要自己进行同步处理。
+
+	String在改变的时候会生成新对象并将指针指向新对象，而StringBuilder在改变的时候直接改变指向的对象，不需要重新新建对象。
+
+	在效率上来说：String<StringBuffer<StringBuiler  但是在String s="adasas"+"dasda"+"asdasd"的情况下， String效率最高，因为这种情况下字符串s直接解析为String s="adasasdasdaasdasd";
+
+
+91.java对象初始化顺序：
+	最先初始化静态域而不是静态代码块，静态域初始化顺序  静态代码块=静态变量>静态方法   静态代码块和静态变量的初始化顺序由它俩的位置决定。
+	然后初始化，非静态变量   最后进入初始化函数。
+
+
+92.java类加载顺序：
+	1.首先，需要明白类的加载顺序。
+	(1) 父类静态代码块(包括静态初始化块，静态属性，但不包括静态方法)
+	(2) 子类静态代码块(包括静态初始化块，静态属性，但不包括静态方法 )
+	(3) 父类非静态代码块( 包括非静态初始化块，非静态属性 )
+	(4) 父类构造函数
+	(5) 子类非静态代码块 ( 包括非静态初始化块，非静态属性 )
+	(6) 子类构造函数
+	其中：类中静态块按照声明顺序执行，并且(1)和(2)不需要调用new类实例的时候就执行了(意思就是在类加载到方法区的时候执行的)
+	2.其次，需要理解子类覆盖父类方法的问题，也就是方法重写实现多态问题。
+	Base b = new Sub();它为多态的一种表现形式，声明是Base,实现是Sub类， 理解为 b 编译时表现为Base类特性，运行时表现为Sub类特性。
+	当子类覆盖了父类的方法后，意思是父类的方法已经被重写，题中 父类初始化调用的方法为子类实现的方法，子类实现的方法中调用的baseName为子类中的私有属性。
+	由1.可知，此时只执行到步骤4.,子类非静态代码块和初始化步骤还没有到，子类中的baseName还没有被初始化。所以此时 baseName为空。 所以为null。
+
+	public class Base
+	{
+	    private String baseName = "base";
+	    public Base()
+	    {
+		callName();
+	    }
+	 
+	    public void callName()
+	    {
+		System. out. println(baseName);
+	    }
+	 
+	    static class Sub extends Base
+	    {
+		private String baseName = "sub";
+		public void callName()
+		{
+		    System. out. println (baseName) ;
+		}
+	    }
+	    public static void main(String[] args)
+	    {
+		Base b = new Sub();
+	    }
+	}
+
+93.java实现线程的等待和唤醒：
+	wait()、notify()和notifyAll()是 Object类 中的方法 ；
+
+	Condition是在java 1.5中才出现的，它用来替代传统的Object的wait()、notify()实现线程间的协作，相比使用Object的wait()、 notify()，
+	使用Condition的await()、signal()这种方式实现线程间协作更加安全和高效。 
+
+94.java中ResultSet的索引从1开始
+
+95.&在逻辑中是非短路与，在位运算中是按位与。
+
+96.java中声明数组的方式：
+	1.必须要定义一个维度的长度。如：int a[][]=new int[][];这样就是错误的    正确格式：int a[][]=new int[][2];
+	2.变量名的定义[]可以放在任意位置 比如： int [][]a []a[] 都是正确的格式.
+
+97.对象序列化：
+	1.类实现serializable接口，如果成员变量不是基本类型，那么成员变量也要实现serializable接口。
+	2.使用transient修饰的变量不会进行序列化。
+	3.要使用ObjectOutputStream来进行传输。
+
+98.System.out.println()方法：
+	System是java.lang包下的一个类，out为System的final静态成员（PrintStream类型），println()是PrintStream类的实例方法。
+
+99.在java中，当方式调用完成，并不会由垃圾收集器收回方法占用的内存，因为在调用方法的时候，会在栈中生成对应的栈帧。所以，方法调用结束后应该是栈帧出栈，而不是回收内存。
+   因为这个方法的信息有可能会被其他对象使用。
+
+100.
+	1.抽象方法只能定义在抽象类中，抽象方法和抽象类必须由abstract修饰，abstract关键字只能描述类和方法，不能描述变量。
+	抽象方法只定义方法声明，不定义方法实现。抽象类不可以被实例化（创建对象），只有通过子类继承抽象类并覆盖抽象类中的所有抽象方法后，该子类才可以被实例化，
+	否则该子类还是一个抽象类。抽象类中有构造函数用于给子类对象进行初始化，同时抽象类中可以含有非抽象方法。
+	abstract关键字不可以与final，private,static关键字共存，因为被final修饰的方法不可以被重写，意味着子类不可以重写该方法，
+	如果abstract和final共同修饰父类中的方法，子类要实现抽象方法（abstract的作用），而final又不让该方法重写，这相互矛盾。
+	如果private和abstract共同修饰父类中的方法，private修饰则该方法不可以被子类访问，但是abstract修饰需要子类去实现，两者产生矛盾。
+	如果static和abstract共同修饰父类中的方法，static表示是静态的方法，随着类的加载而加载，则该方法不需要在子类中去实现，这与abstract关键字矛盾。 
+
+	2.static用于修饰成员变量和成员函数，想要实现对象中的共性数据的对象共享，可以将这个数据进行静态修饰，被静态修饰的成员可以直接被类名调用，静态随着类的加载而加载，
+	而且优先于对象存在。静态方法只能访问静态成员（静态方法和静态变量），不可以访问非静态成员，这是因为静态方法加载时，优先于对象存在，所以没有办法访问对象中的成员。
+	静态方法中不能使用this和super关键字，因为this代表本类对象，super代表父类对象，而静态时，有可能没有对象存在，所以this和super无法使用。 
+
+	3.final关键字可以修饰类，方法，变量（成员变量内，局部变量，静态变量），被final修饰的类是一个最终类，不可以被继承，被final修饰的方法是一个最终方法，不可以被覆盖，
+	但是可以被继承。被final修饰的变量只能是一个常量，只能赋值一次。内部类被定义在类中的局部位置上时，只能访问局部被final修饰的局部变量。
+
+101.java中常量池在内存中位置的变化
+	在Java7之前，HotSpot虚拟机中将GC分代收集扩展到了方法区，使用永久代来实现了方法区。这个区域的内存回收目标主要是针对常量池的回收和对类型的卸载。
+	但是在之后的HotSpot虚拟机实现中，逐渐开始将方法区从永久代移除。Java7中已经将运行时常量池从永久代移除，在Java 堆（Heap）中开辟了一块区域存放运行时常量池。
+	而在Java8中，已经彻底没有了永久代，将方法区直接放在一个与堆不相连的本地内存区域，这个区域被叫做元空间。 
+
+	总结：jdk1,6常量池放在方法区，jdk1.7常量池放在堆内存，jdk1.8放在元空间里面，和堆相独立。所以导致string的intern方法因为以上变化在不同版本会有不同表现。
+
+102.

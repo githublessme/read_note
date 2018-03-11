@@ -1,0 +1,40 @@
+Arrays.copyOf
+	底层使用System.arraycopy实现的。
+
+ArrayList
+	初始容量10个
+	三个构造函数
+		1.public ArrayList （int initCapacity） 指定初始容量
+		2.public ArrayList （）  空构造函数，赋值为空数组
+		3.public ArrayList （Collection<? extends E> c) 先通过toArray方法把c转换为数组，然后当size不为0时，调用copyOf方法填充
+
+	成员变量：
+		private static final int DEFAULT_CAPACITY 初始容量，默认10，可以通过构造函数改变初始容量，
+		private static final Object[] DEFAULTCAPACITY_EMPTY_ELEMENTDATA 空的Object数组，当size为0的时候赋值用。
+		private static final Object[] EMPTY_ELEMENTDATA = {}    //待解决
+		transient Object[] elementData
+
+	方法：
+		trimToSize（） 将容量削减到当前容量。没有空余数组
+		
+		扩容：
+			1.得到当前的ArrayList的容量(oldCapacity)。
+			2.计算除扩容后的新容量(newCapacity)，其值(oldCapacity + (oldCapacity &gt;&gt; 1))约是oldCapacity 的1.5倍。
+			这里采用的是移位运算(关于移位运算，后续会讲到)。为什么采用这种方法呢？应该是出于效率的考虑。
+			3.当newCapacity小于所需最小容量，那么将所需最小容量赋值给newCapacity。
+			4.newCapacity大于ArrayList的所允许的最大容量,处理。
+			5.进行数据的复制，完成向ArrayList实例添加元素操作。
+
+		indexOf（Object o） 当o为null也查找，如果有null返回位置。（单独放一个循环，避免空指针异常）。不为null查找，返回o的位置。
+		
+		lastIndexOf（Object o）和indexOf差不多，但是这个方法是从最大的角标往回遍历的。
+
+		toArray（） 使用Arrays.copyOf方法实现  Arrays.copyOf(elementData,size)
+
+		add（E e）不多说，elementDate[size++]=e；
+		
+		add（int index,E e）通过System.arraycopy方法把index后的元素复制一下，然后elementData[index]=e
+
+		checkRange（）超出容量抛出IndexOutOfBoundsException这个异常
+
+
