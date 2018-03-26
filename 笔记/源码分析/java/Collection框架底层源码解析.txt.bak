@@ -37,16 +37,4 @@ ArrayList
 
 		checkRange（）超出容量抛出IndexOutOfBoundsException这个异常
 
-		removeAll(Collection<?> c) 先判断是不是空的，通过Objects.requireNonNull(Object o),这个方法，如果传入的o是null抛出空指针异常。然后调用batchRemove（c，false）；
-		
-		retainAll(Collection<?> c) Objects.requireNonNull(Object o）判断非空后，调用batchRemove(Collection<?> c,true)
-
-		batchRemove（Collection<?> c,boolean complement） complement 是用来判断是保留相同元素还是相异元素的。true时保存相同元素，即取交集。false时保存不同元素，即删除c中所有元素。改完将w后面的元素置为null方便垃圾回收。最后记得修改size
-
-		自身内部实现一个private class Itr implements Iterator
-	
-
-
-
-
 

@@ -1,0 +1,154 @@
+创建数据库：
+	use Database_name 如果有对应数据库就使用，没有就创建一个新的数据库。
+
+删除数据库：
+	db.dropDatabase()
+
+删除集合：
+	db.collection.drop();
+
+创建集合：
+	db.createCollection(name, options) name为要创建的集合名称    options是可选参数，指定内存大小及索引的选项
+	例： db.createCollection("mycol", { capped : true, autoIndexId : true, size : 6142800, max : 10000 } ) 
+	
+	capped  boolean  （可选）如果为 true，则创建固定集合。固定集合是指有着固定大小的集合，当达到最大值时，它会自动覆盖最早的文档。当该值为 true 时，必须指定 size 参数。
+	autoIndexId  boolean  （可选）如为 true，自动在 _id 字段创建索引。默认为 false。
+	size  数值  （可选）为固定集合指定一个最大值（以字节计）。如果 capped 为 true，也需要指定该字段。
+	max  数值  （可选）指定固定集合中包含文档的最大数量。
+
+插入文档：
+	db.collection_name.insert(document);
+	例：db.col.insert({title: 'MongoDB 教程', 
+			   description: 'MongoDB 是一个 Nosql 数据库',
+			   by: '菜鸟教程',
+			   url: 'http://www.runoob.com',
+			   tags: ['mongodb', 'database', 'NoSQL'],
+                           likes: 100
+			  })
+
+查看已插入的文档：
+	db.collection_name.find()
+
+定义一个变量
+	document=({title: 'MongoDB 教程', 
+			description: 'MongoDB 是一个 Nosql 数据库',
+			by: '菜鸟教程',
+			url: 'http://www.runoob.com',
+			tags: ['mongodb', 'database', 'NoSQL'],
+			likes: 100});
+然后通过 db.collection_name.insert(document);来进行插入
+插入文档你也可以使用 db.col.save(document) 命令。如果不指定 _id 字段 save() 方法类似于 insert() 方法。如果指定 _id 字段，则会更新该 _id 的数据。
+
+
+更新文档：
+	db.collection.update(
+	   <query>,
+	   <update>,
+	   {
+	     upsert: <boolean>,
+	     multi: <boolean>,
+	     writeConcern: <document>
+	   }
+	)
+
+	query : update的查询条件，类似sql update查询内where后面的。
+	update : update的对象和一些更新的操作符（如$,$inc...）等，也可以理解为sql update查询内set后面的
+	upsert : 可选，这个参数的意思是，如果不存在update的记录，是否插入objNew,true为插入，默认是false，不插入。
+	multi : 可选，mongodb 默认是false,只更新找到的第一条记录，如果这个参数为true,就把按条件查出来多条记录全部更新。
+	writeConcern :可选，抛出异常的级别。
+
+	例：
+	db.collection_name.update({'title':'MongoDB 教程'},{$set:{'title':'MongoDB'}})
+
+
+删除文档：
+	db.collection_name.remove(
+	    <query>,
+	   {
+	     justOne: <boolean>,
+	     writeConcern: <document>
+	   });
+
+注：现在remove方法已经过时，现在推荐使用 deleteOne和deleteMany方法
+
+查询文档：
+	db.collection_name.find(query, projection)
+	query ：可选，使用查询操作符指定查询条件
+	projection ：可选，使用投影操作符指定返回的键。查询时返回文档中所有键值， 只需省略该参数即可（默认省略）。
+	如果你需要以易读的方式来读取数据，可以使用 pretty() 方法，语法格式如下：
+	db.col.find().pretty()；查出来的结果都是类似json格式化的样子
+
+	等于		{<key>:<value>}		 db.col.find({"by":"菜鸟教程"}).pretty()		where by = '菜鸟教程'
+	小于		{<key>:{$lt:<value>}}	 db.col.find({"likes":{$lt:50}}).pretty()	where likes < 50
+	小于或等于	{<key>:{$lte:<value>}}	 db.col.find({"likes":{$lte:50}}).pretty()	where likes <= 50
+	大于		{<key>:{$gt:<value>}}	 db.col.find({"likes":{$gt:50}}).pretty()	where likes > 50
+	大于或等于	{<key>:{$gte:<value>}}	 db.col.find({"likes":{$gte:50}}).pretty()	where likes >= 50
+	不等于		{<key>:{$ne:<value>}}	 db.col.find({"likes":{$ne:50}}).pretty()	where likes != 50
+
+	and条件： db.col.find({key1:value1, key2:value2}).pretty()
+	or条件：  db.col.find(
+		   {
+		      $or: [
+			 {key1: value1}, {key2:value2}
+		      ]
+		   }).pretty()
+	联合使用and和or：  db.col.find({"likes": {$gt:50}, $or: [{"by": "菜鸟教程"},{"title": "MongoDB 教程"}]}).pretty()
+
+
+$type操作符：
+	Double		1	 
+	String		2	 
+	Object		3	 
+	Array		4	 
+	Binary data	5	 
+	Undefined	6	已废弃。
+	Object id	7	 
+	Boolean		8	 
+	Date		9	 
+	Null		10	 
+	Regular Expression	11	 
+	JavaScript	13	 
+	Symbol		14	 
+	JavaScript (with scope)	15	 
+	32-bit integer	16	 
+	Timestamp	17	 
+	64-bit integer	18	 
+	Min key		255	Query with -1.
+	Max key		127	 
+
+实例：
+	如果想获取 "col" 集合中 title 为 String 的数据，你可以使用以下命令：
+	db.col.find({"title" : {$type : 2}})
+
+
+skip和limit操作：
+	用来对查询结果进行筛选的
+	db.collection_name.find.limit(2).skip(1)是   从第二条开始返回两条结果
+
+sort排序操作：
+	sort()方法可以通过参数指定排序的字段，并使用 1 和 -1 来指定排序的方式，其中 1 为升序排列，而-1是用于降序排列。
+	例：db.col.find({},{"title":1,_id:0}).sort({"likes":-1})
+	注：skip(), limilt(), sort()三个放在一起执行的时候，执行的顺序是先 sort(), 然后是 skip()，最后是显示的 limit()。
+
+创建索引：
+	db.collection_name.ensureIndex({key:1});
+	例：db.col.ensureIndex({"title":1})；   按照title  升序创建索引。
+	    db.col.ensureIndex({"title":1,"description":-1})   这个是创建 title 和 description的复合索引
+	
+	ensureIndex操作的可选参数：
+		background		Boolean		建索引过程会阻塞其它数据库操作，background可指定以后台方式创建索引，即增加 "background" 可选参数。 "background" 默认值为false。
+		unique			Boolean		建立的索引是否唯一。指定为true创建唯一索引。默认值为false.
+		name			string		索引的名称。如果未指定，MongoDB的通过连接索引的字段名和排序顺序生成一个索引名称。
+		dropDups		Boolean		在建立唯一索引时是否删除重复记录,指定 true 创建唯一索引。默认值为 false.
+		sparse			Boolean		对文档中不存在的字段数据不启用索引；这个参数需要特别注意，如果设置为true的话，在索引字段中不会查询出不包含对应字段的文档.。默认值为 false.
+		expireAfterSeconds	integer		指定一个以秒为单位的数值，完成 TTL设定，设定集合的生存时间。
+		v			index version	索引的版本号。默认的索引版本取决于mongod创建索引时运行的版本。
+		weights			document	索引权重值，数值在 1 到 99,999 之间，表示该索引相对于其他索引字段的得分权重。
+		default_language	string		对于文本索引，该参数决定了停用词及词干和词器的规则的列表。 默认为英语
+		language_override	string		对于文本索引，该参数指定了包含在文档中的字段名，语言覆盖默认的language，默认值为 language.
+
+	
+聚合（相当于count（*））：
+
+	db.COLLECTION_NAME.aggregate(AGGREGATE_OPERATION)
+还没看完。打个标记
