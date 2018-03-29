@@ -1,0 +1,252 @@
+shiro的功能：
+	Authentication：身份认证 / 登录，验证用户是不是拥有相应的身份；
+
+	Authorization：授权，即权限验证，验证某个已认证的用户是否拥有某个权限；即判断用户是否能做事情，常见的如：验证某个用户是否拥有某个角色。或者细粒度的验证某个用户对某个资源是否具有某个权限；
+
+	Session Manager：会话管理，即用户登录后就是一次会话，在没有退出之前，它的所有信息都在会话中；会话可以是普通 JavaSE 环境的，也可以是如 Web 环境的；
+
+	Cryptography：加密，保护数据的安全性，如密码加密存储到数据库，而不是明文存储；
+
+	Web Support：Web 支持，可以非常容易的集成到 Web 环境；
+
+	Caching：缓存，比如用户登录后，其用户信息、拥有的角色 / 权限不必每次去查，这样可以提高效率；
+
+	Concurrency：shiro 支持多线程应用的并发验证，即如在一个线程中开启另一个线程，能把权限自动传播过去；
+
+	Testing：提供测试支持；
+
+	Run As：允许一个用户假装为另一个用户（如果他们允许）的身份进行访问；
+
+	Remember Me：记住我，这个是非常常见的功能，即一次登录后，下次再来的话不用登录了。
+
+
+shiro中的概念：
+	Subject：主体，可以看到主体可以是任何可以与应用交互的 “用户”；
+
+	SecurityManager：相当于 SpringMVC 中的 DispatcherServlet 或者 Struts2 中的 FilterDispatcher；是 Shiro 的心脏；所有具体的交互都通过 SecurityManager 进行控制；它管理着所有 Subject、且负责进行认证和授权、及会话、缓存的管理。
+
+	Authenticator：认证器，负责主体认证的，这是一个扩展点，如果用户觉得 Shiro 默认的不好，可以自定义实现；其需要认证策略（Authentication Strategy），即什么情况下算用户认证通过了；
+
+	Authrizer：授权器，或者访问控制器，用来决定主体是否有权限进行相应的操作；即控制着用户能访问应用中的哪些功能；
+
+	Realm：可以有 1 个或多个 Realm，可以认为是安全实体数据源，即用于获取安全实体的；可以是 JDBC 实现，也可以是 LDAP 实现，或者内存实现等等；由用户提供；注意：Shiro 不知道你的用户 / 权限存储在哪及以何种格式存储；所以我们一般在应用中都需要实现自己的 Realm；
+
+	SessionManager：如果写过 Servlet 就应该知道 Session 的概念，Session 呢需要有人去管理它的生命周期，这个组件就是 SessionManager；而 Shiro 并不仅仅可以用在 Web 环境，也可以用在如普通的 JavaSE 环境、EJB 等环境；所有呢，Shiro 就抽象了一个自己的 Session 来管理主体与应用之间交互的数据；这样的话，比如我们在 Web 环境用，刚开始是一台 Web 服务器；接着又上了台 EJB 服务器；这时想把两台服务器的会话数据放到一个地方，这个时候就可以实现自己的分布式会话（如把数据放到 Memcached 服务器）；
+
+	SessionDAO：DAO 大家都用过，数据访问对象，用于会话的 CRUD，比如我们想把 Session 保存到数据库，那么可以实现自己的 SessionDAO，通过如 JDBC 写到数据库；比如想把 Session 放到 Memcached 中，可以实现自己的 Memcached SessionDAO；另外 SessionDAO 中可以使用 Cache 进行缓存，以提高性能；
+
+	CacheManager：缓存控制器，来管理如用户、角色、权限等的缓存的；因为这些数据基本上很少去改变，放到缓存中后可以提高访问的性能
+
+	Cryptography：密码模块，Shiro 提高了一些常见的加密组件用于如密码加密 / 解密的。
+
+
+shiro的身份验证：
+	在 shiro 中，用户需要提供 principals （身份）和 credentials（证明）给 shiro，从而应用能验证用户身份：
+	principals：身份，即主体的标识属性，可以是任何东西，如用户名、邮箱等，唯一即可。一个主体可以有多个 principals，但只有一个 Primary principals，一般是用户名 / 密码 / 手机号。
+	credentials：证明 / 凭证，即只有主体知道的安全值，如密码 / 数字证书等。
+	最常见的 principals 和 credentials 组合就是用户名 / 密码了。
+
+
+	 步骤：
+		首先通过 new IniSecurityManagerFactory 并指定一个 ini 配置文件来创建一个 SecurityManager 工厂；
+
+		接着获取 SecurityManager 并绑定到 SecurityUtils，这是一个全局设置，设置一次即可；
+
+		通过 SecurityUtils 得到 Subject，其会自动绑定到当前线程；如果在 web 环境在请求结束时需要解除绑定；然后获取身份验证的 Token，如用户名 / 密码；
+
+		调用 subject.login 方法进行登录，其会自动委托给 SecurityManager.login 方法进行登录；
+
+		如果身份验证失败请捕获 AuthenticationException 或其子类，常见的如： DisabledAccountException（禁用的帐号）、LockedAccountException（锁定的帐号）、UnknownAccountException（错误的帐号）、ExcessiveAttemptsException（登录失败次数过多）、IncorrectCredentialsException （错误的凭证）、ExpiredCredentialsException（过期的凭证）等，具体请查看其继承关系；对于页面的错误消息展示，最好使用如 “用户名 / 密码错误” 而不是 “用户名错误”/“密码错误”，防止一些恶意用户非法扫描帐号库；
+
+		最后可以调用 subject.logout 退出，其会自动委托给 SecurityManager.logout 方法退出。
+
+
+在spring中集成Shiro：
+
+	1.在web.xml中配置ShiroFilter
+	<filter>
+		<filter-name>shiroFilter</filter-name>
+		<filter-class>org.spirngframework.web.filter.DelegatingFilterProxy</filter-class>
+		<init-param>
+			<param-name>targetFilterLifecycle</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>shiroFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	//在emap项目中没有看到这种配置方法。
+
+
+	1.配置securityManager
+	<bean id="securityManager class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+		<property name="cacheManager" ref="cacheManager"/>
+		<property name="realm" ref="userRealm"/>
+		<property name="sessionManager" ref="sessionManager"/>
+	</bean>
+
+	2.配置cacheManager
+		公司的项目用的是spring的缓存。
+		自己实现了一个CacheManager，然后里面有一个成员变量是org.springframework.cache.ehcache.EhCacheCacheManager
+		在org.springframework.cache.ehcache.EhCacheCacheManager中有一个成员变量是org.springframework.cache.ehcache.EhCacheManagerFactoryBean
+		在org.springframework.cache.ehcache.EhCacheManagerFactoryBean中有一个configLocation来定位ehcache的配置文件。
+	
+
+	3.配置Realm
+	3.1自定义Realm实现org.apache.shiro.realm.Realm接口(emap项目是继承AuthorizingRealm类)
+	3.2Realm还要替换Matcher的实现，可以自定义也可以用现成的。用来匹配密码的。
+
+	4.配置LifeCycleBeanPostProcessor。可以自动的调用配置的spring IOC 容器中shiro bean 的生命周期方法。
+		<bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spirng.LifeCycleBeanPostProcessor"/>
+
+
+	5.启用IOC 容器中使用shiro注解，但必须在配置了LifeCycleBeanPostProcessor之后才能使用。
+	<bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" depends-on="lifecycleBeanPostProcessor"/>
+	<bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+		<property name="securityManager" ref="securityManager"/>
+	</bean>
+
+
+	6.配置shiroFilter。
+	6.1 id必须和web.xml文件中配置的DelegatingFilterProxy的<filter-name>一样
+	6.2配置各种状态对应的页面   成功的、没授权的、login的  例：<property name="loginUrl" value="/login.jsp"/>
+	6.3配置哪些页面需要受保护，以及访问这些页面需要的权限。
+		1）anon可以被匿名访问
+		2）authc 必须认证（即登录）
+		例：<property name="filterChainDefinitions">
+			<value>
+				/assets/** = anon
+				/=anon	
+				/index.jsp=anon				
+				/sh/login = anon
+				/sh/authc = anon
+				/login = authc
+				/logout = logout
+				/sh/logout=logout
+				/authenticated = authc
+				/sh/**=jsonUser,userSession
+				/** = user,userSession
+			</value>
+		    </property>
+
+
+
+
+
+shiro的认证步骤：
+	1.获取当前的subject，调用SecurityUtils.getSubject();
+	2.测试当前用户是否已被认证，即是否已经登录，调用subject的isAuthenticated方法。
+	3.若没有被认证，则将用户名密码封装成为UsernamePasswordToken对象
+		1）创建一个表单页面，在页面提交用户名密码
+		2）将请求提交到SpringMVC的Handler
+		3）获取用户名和密码
+	4.执行登录：调用Subject的login(AuthenticatedTOken)方法，可以见得UsernamePasswordToken是AuthenticatedToken的一个实现类
+	5.自定义Realm的方法，从数据库获取对应记录，返回给Shiro。
+		1）实际上需要继承org.apache.shiro.realm.AuthenticatingRealm类
+		2）实现doGetAuthticationInfo（AuthticationToken）方法
+	6.由Shiro完成对密码的比对
+		1）将AuthenticationToken转换为UsernamePasswordToken
+			UsernamePasswordToken upToken = (UsernamePassowrdToken) token();
+		2）从UsernamePasswordToken中取得username
+			String username = upToken.getUsername();
+		3）调用数据库方法，从数据库中查询对应的用户记录。
+			涉及JDBC操作，不多说
+		4）若用户不存在，可以抛出UnknownAccountException
+		5）根据用户信息的情况，决定是否抛出其他的AuthenticationException
+		6）根据用户的情况，来构建AuthenticationInfo对象并返回,通常使用的实现类为：SimpleAuthenticationInfo
+			SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(principal,credentials,realmName);
+				1）principal：认证的实体信息，可以使Username也可以是数据表对应的实体类对象
+				2）credentials：是从数据库中获得的密码
+				3）当前realm对象的name，调用父类的getName方法即可。
+		
+
+shiro多Realm认证：
+	1.自定义两个Realm实现，然后在配置文件中进行配置。
+	2.配置一个ModularRealmAuthenticator的bean
+		<bean id="authenticator" class="org.apache.shiro.authc.pam.ModularRealmAuthenticator">
+			<property name="realms">
+				<list>
+					<ref bean="firstRealm"/>
+					<ref bean="secondRealm"/>
+				</list>
+			</property>
+		</bean>
+
+	3.在SecurityManager中配置<property name="authenticator" ref="authenticator"/>
+
+
+
+shiro多Realm认证策略：
+	在ModularRealmAuthenticator的bean中进行配置认证策略
+	<bean id="authenticator" class="org.apache.shiro.authc.pam.ModularRealmAuthenticator">
+			<property name="realms">
+				<list>
+					<ref bean="firstRealm"/>
+					<ref bean="secondRealm"/>
+				</list>
+			</property>
+			<property name="authenticationStrategy">                                           //从此处开始配置认证策略
+				<bean class="org.apache.shiro.authc.pam.AllSuccessfulStrategy"/>
+			</property>
+	</bean>
+
+
+shiro将多个Realms配置给SecurityManager
+	<bean id="securityManager class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+		<property name="cacheManager" ref="cacheManager"/>
+		<property name="realm" ref="userRealm"/>
+		<property name="sessionManager" ref="sessionManager"/>
+		<property name="realms">
+			<list>
+				<ref bean="firstRealm"/>
+				<ref bean="secondRealm"/>
+			</list>
+		</property>
+	</bean>
+
+
+	这样就可以把ModularRealmAuthenticator里面的realms配置删除，，因为当SecurityManager检测到多realms的时候会将多个reamls设置给验证器，即authenticator。
+
+
+
+
+shiro配置过滤器
+	FormAuthenticationFilter   表单的身份验证过滤器
+	
+
+
+
+
+
+shiro的授权：
+	1.需要继承AuthorizingRealm类，并实现其doGetAuthorizationInfo方法。
+	2.AuthorizingRealm类继承自AuthenticatingRealm，但是没有实现其AuthenticatingRealm中的doGetAuthenticationInfo方法。
+	3.所以完成认证和授权只需要继承AuthorizingRealm就可以了，然后同时实现doGetAuthenticationInfo方法和doGetAuthorizationInfo方法。
+
+
+shiro的session和HttpSession是互通的，在Service层也可以通过SubjectUtils.getSubject().getSession()获取到session。这样在开发的时候很方便，因为可以在service层获取到Session。
+
+
+
+设置SessionDAO（注意一定要设置SessionIdGenerator）（还要把sessionDAO放到SessionManager里面）：
+	<bean id="sessionDAO" class="org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO">
+		<property name="activeSessionsCacheName" value="shiro-activeSessionCache" />
+		<property name="sessionIdGenerator" ref="sessionIdGenerator" />
+	</bean>
+	<bean id="sessionIdGenerator" class="org.apache.shiro.session.mgt.eis.JavaUuidSessionIdGenerator" />
+
+	<bean id="sessionManager" class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
+		<property name="globalSessionTimeout" value="7200000" />
+		<property name="deleteInvalidSessions" value="true" />
+		<property name="sessionValidationSchedulerEnabled" value="true" />
+		<property name="sessionValidationScheduler" ref="sessionValidationScheduler" />
+		<property name="sessionDAO" ref="sessionDAO" />
+		<property name="sessionIdCookieEnabled" value="true" />
+		<property name="sessionIdCookie" ref="sessionIdCookie" />
+	</bean>
+
+	然后把sessionManage配置给SecurityManager里面的 sessionManager属性
+	<property name="sessionManager" ref="sessionManager"/>
+
+
