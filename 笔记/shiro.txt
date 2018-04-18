@@ -250,3 +250,21 @@ shiro的session和HttpSession是互通的，在Service层也可以通过SubjectU
 	<property name="sessionManager" ref="sessionManager"/>
 
 
+shiro的缓存：
+	shiro内部组件DefaultSecurtiyManager会自动检测相应的对象（如Realm）是否实现了CacheManagerAware并自动注入CacheManager
+	我们一般创建Realm会继承AuthorizingRealm类，AuthorizingRealm类会继承AuthenticatingRealm类，AuthenticatingRealm会继承CachingRealm，而CachingRealm实现了CacheManagerAware接口
+	所以会自动注入CacheManager，一般继承AuthorizingRealm的Realm都会有缓存。
+
+	如果没有缓存，每次请求对应权限才能访问的页面的时候，点一次验证一次，如果有缓存，只有第一次需要验证。
+
+
+Remember Me：
+	实现原理是：将Cookie写到客户端。访问一般的网页可以知道你是谁，但是当访问一些重要的网页的时候，还是需要身份认证。
+
+	认证（Authoriticate）和Remember Me的区别：互斥，
+
+
+修改RememberMe的Cookie生命周期：
+	在SecurityManager中的RememberMeManager中的cookie的maxAge设置
+	在配置文件中
+		<property name="remenbermeManager.cookie.maxAge" value="10" />

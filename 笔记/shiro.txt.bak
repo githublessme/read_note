@@ -245,3 +245,8 @@ shiro的session和HttpSession是互通的，在Service层也可以通过SubjectU
 		<property name="sessionIdCookieEnabled" value="true" />
 		<property name="sessionIdCookie" ref="sessionIdCookie" />
 	</bean>
+
+	然后把sessionManage配置给SecurityManager里面的 sessionManager属性
+	<property name="sessionManager" ref="sessionManager"/>
+
+
